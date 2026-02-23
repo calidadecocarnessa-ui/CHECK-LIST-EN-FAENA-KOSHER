@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>R-BA-001-6 | Check List Bienestar Animal Kosher</title>
+
+  <style>
+    :root{
+      --bg:#f0f2f5; --card:#ffffff; --text:#111827; --muted:#6b7280;
+      --border:#e5e7eb; --accent:#2563eb; --danger:#ef4444; --ok:#16a34a;
+      --soft:#cbd5e1;
+    }
+    body.dark{ --bg:#0f172a; --card:#1e293b; --text:#f8fafc; --muted:#94a3b8; --border:#334155; --soft:#334155; }
+    body{ margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text); padding:10px; }
+
+    /* Encabezado estilo planilla */
+    .encabezado{ background:#e5e7eb; border:2px solid #111; margin-bottom:10px; }
+    .encabezado table{ width:100%; border-collapse:collapse; }
+    .encabezado td{ border:2px solid #111; padding:8px; vertical-align:middle; }
+    .encabezado .logo{ width:180px; text-align:center; background:#f3f4f6; }
+    .encabezado .logo img{ max-height:70px; max-width:160px; object-fit:contain; display:block; margin:0 auto; }
+    .encabezado .titulo{ text-align:center; font-size:13px; line-height:1.25; }
+    .encabezado .titulo strong{ font-size:14px; }
+    .encabezado .info{ width:260px; font-size:12px; background:#dbeafe; line-height:1.25; }
+
+    /* Tabs */
+    .tabs{ display:flex; gap:6px; margin-bottom:10px; }
+    .tab-btn{
+      flex:1; padding:12px; border:none; border-radius:12px; font-weight:900; cursor:pointer;
+      background:var(--soft); color:#334155;
+    }
+    body.dark .tab-btn{ color:#e2e8f0; }
+    .tab-btn.active{ background:var(--accent); color:#fff; }
+    .tab-content{ display:none; }
+    .tab-content.active{ display:block; }
+
+    /* Toolbar */
+    .toolbar{
+      display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;
+      background:var(--card); border:1px solid var(--border); border-radius:14px; padding:10px;
+    }
+    .toolbar button{
+      flex:1; min-width:150px; height:54px;
+      border:none; border-radius:12px; cursor:pointer; font-weight:900;
+      background:var(--accent); color:#fff;
+    }
+    .toolbar button.danger{ background:var(--danger); }
+    .toolbar button.ok{ background:var(--ok); }
+    .toolbar button.gray{ background:#64748b; }
+
+    .card{
+      background:var(--card); border:1px solid var(--border); border-radius:16px; padding:12px; margin-bottom:10px;
+    }
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    label{ font-size:11px; font-weight:900; color:var(--muted); text-transform:uppercase; }
+    input, select, textarea{
+      width:100%; box-sizing:border-box;
+      background:var(--bg); color:var(--text);
+      border:1px solid var(--border); border-radius:10px;
+      padding:10px; font-size:16px;
+    }
+    textarea{ min-height:44px; resize:vertical; }
+    .small{ font-size:12px; color:var(--muted); }
+
+    /* Tabla */
+    .table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:14px; background:var(--card); }
+    table{ width:100%; border-collapse:collapse; }
+    th, td{ border-bottom:1px solid var(--border); padding:10px; vertical-align:middle; }
+    th{ position:sticky; top:0; background:#e5e7eb; color:#111; font-size:12px; text-transform:uppercase; }
+    body.dark th{ background:#0b1220; color:#e5e7eb; }
+
+    .pill{
+      display:inline-block; padding:5px 10px; border-radius:999px;
+      font-size:12px; font-weight:1000; background:#e5e7eb; color:#111;
+    }
+    .pill.ok{ background:#dcfce7; color:#14532d; }
+    .pill.nc{ background:#fee2e2; color:#7f1d1d; }
+
+    .btn-mini{
+      border:none; border-radius:10px; padding:9px 12px; cursor:pointer; font-weight:900;
+      background:var(--accent); color:#fff;
+    }
+    .btn-mini.danger{ background:var(--danger); }
+    .btn-mini.gray{ background:#64748b; }
+
+    /* Impresión */
+    #print-area{ display:none; }
+    @media print{
+      body{ padding:0; background:#fff; }
+      .tabs, .toolbar, .card, .table-wrap { display:none !important; }
+      #print-area{ display:block !important; }
+      @page{ size:A4 portrait; margin:0.8cm; }
+      .print-table th{ background:#e5e7eb !important; -webkit-print-color-adjust:exact; }
+      .print-table, .print-table th, .print-table td{ border:1px solid #111; }
+      .print-table th, .print-table td{ font-size:10pt; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ENCABEZADO -->
+  <div class="encabezado">
+    <table>
+      <tr>
+        <td class="logo">
+          <img src="logo.jpg" alt="Logo"
+               onerror="this.style.display='none'; this.parentNode.innerHTML='(No se encontró logo.jpg)';" />
+        </td>
+        <td class="titulo">
+          <strong>CHECK LIST</strong><br>
+          BIENESTAR ANIMAL EN FAENA KOSHER<br>
+          <span style="font-weight:1000;">ISRAEL</span>
+        </td>
+        <td class="info">
+          <div><b>Circular:</b> 4170 A</div>
+          <div><b>Código:</b> R-BA-001-6</div>
+          <div><b>Emisión:</b> Junio / 2024</div>
+          <div><b>Rev:</b> 03</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab(event,'t1')">CHECKLIST</button>
+    <button class="tab-btn" onclick="openTab(event,'t2')">RESUMEN / NC</button>
+    <button class="tab-btn" onclick="openTab(event,'t3')">DÍAS FINALIZADOS</button>
+  </div>
+
+  <!-- TAB 1: CHECKLIST -->
+  <div id="t1" class="tab-content active">
+
+    <div class="toolbar">
+      <button class="gray" onclick="document.body.classList.toggle('dark')">TEMA</button>
+      <button onclick="printPDF()">PDF (IMPRIMIR)</button>
+      <button onclick="downloadBackup()">DESCARGAR RESPALDO</button>
+      <button onclick="triggerImport()">IMPORTAR RESPALDO</button>
+      <button class="ok" onclick="finalizeDay()">FINALIZAR DÍA</button>
+      <button class="danger" onclick="clearToday()">BORRAR DÍA</button>
+    </div>
+
+    <div class="card">
+      <div class="grid">
+        <div>
+          <label>Fecha de faena</label>
+          <input type="date" id="inFecha">
+        </div>
+        <div>
+          <label>Rango de garrón (inicio)</label>
+          <input type="number" id="inStart" min="1" placeholder="Ej: 1">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button onclick="applyRange()" style="flex:1; height:52px; border:none; border-radius:12px; background:#0ea5e9; color:#fff; font-weight:1000;">
+          CARGAR 100 GARRONES (planilla)
+        </button>
+        <button onclick="addOneRow()" style="flex:1; height:52px; border:none; border-radius:12px; background:#16a34a; color:#fff; font-weight:1000;">
+          +1 GARRÓN
+        </button>
+      </div>
+
+      <div class="small" style="margin-top:8px;">
+        P1: Tiempo desde contención al degüello (≤ 10 seg) ·
+        P2: Liberación accionamientos sujeción post degüello ·
+        FA: Falso aneurisma ·
+        P3: Liberación del animal del cajón rotatorio
+      </div>
+      <div class="small">
+        Referencias: <b>A</b> = Aceptable · <b>NC</b> = No conforme
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:90px;">Garrón</th>
+            <th style="width:120px;">P1</th>
+            <th style="width:120px;">P2</th>
+            <th style="width:120px;">FA</th>
+            <th style="width:120px;">P3</th>
+            <th>Observaciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Cierre -->
+    <div class="card" style="margin-top:10px;">
+      <div style="font-weight:1000; margin-bottom:8px;">CIERRE DEL REGISTRO</div>
+      <div class="grid">
+        <div>
+          <label>Inspector</label>
+          <input type="text" id="inInspector" placeholder="Nombre y apellido">
+        </div>
+        <div>
+          <label>Verificación</label>
+          <input type="text" id="inVerif" placeholder="Nombre y apellido">
+        </div>
+      </div>
+      <div class="small" style="margin-top:8px;">
+        Completá al final y recién ahí tocá “Finalizar día”.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB 2: RESUMEN / NC -->
+  <div id="t2" class="tab-content">
+    <div class="card">
+      <div style="font-weight:1000; margin-bottom:6px;">RESUMEN</div>
+      <div class="small" id="sumText">—</div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:1000; margin-bottom:6px;">LISTA DE NO CONFORMES (NC)</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:90px;">Garrón</th>
+              <th style="width:90px;">P1</th>
+              <th style="width:90px;">P2</th>
+              <th style="width:90px;">FA</th>
+              <th style="width:90px;">P3</th>
+              <th>Obs</th>
+            </tr>
+          </thead>
+          <tbody id="ncBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: DIAS FINALIZADOS -->
+  <div id="t3" class="tab-content">
+    <div class="card">
+      <div style="font-weight:1000; margin-bottom:6px;">DÍAS FINALIZADOS</div>
+      <div class="small">Acá te quedan guardados los registros “cerrados” para reimprimir o volver a cargar.</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:140px;">Fecha</th>
+            <th>Inspector</th>
+            <th style="width:160px;">NC</th>
+            <th style="width:260px;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="finalBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="print-area"></div>
+  <input type="file" id="importFile" accept="application/json" style="display:none;" />
+
+<script>
+  const KEY_TODAY = "ba_kosher_today_v3";
+  const KEY_FINAL = "ba_kosher_final_v3";
+
+  let today = loadToday();
+  let finals = loadFinals();
+
+  function openTab(evt, id){
+    document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    evt.currentTarget.classList.add("active");
+    if(id === "t2") renderSummary();
+    if(id === "t3") renderFinals();
+  }
+
+  window.onload = () => {
+    const iso = new Date().toISOString().slice(0,10);
+    document.getElementById("inFecha").value = today.fecha || iso;
+    document.getElementById("inStart").value = today.start || "";
+    document.getElementById("inInspector").value = today.inspector || "";
+    document.getElementById("inVerif").value = today.verif || "";
+
+    [["inFecha","fecha"],["inStart","start"],["inInspector","inspector"],["inVerif","verif"]].forEach(([id,key])=>{
+      document.getElementById(id).addEventListener("input", ()=>{
+        today[key] = document.getElementById(id).value;
+        saveToday();
+      });
+    });
+
+    buildTable();
+    renderSummary();
+    renderFinals();
+  };
+
+  function makeRow(g){
+    return { g: Number(g), p1:"A", p2:"A", fa:"A", p3:"A", obs:"" };
+  }
+
+  function applyRange(){
+    const start = Number(document.getElementById("inStart").value || 0);
+    if(!start || start < 1){ alert("Poné el garrón inicial (ej: 1, 101, 201, 301)."); return; }
+    today.start = start;
+    today.rows = [];
+    for(let i=0;i<100;i++) today.rows.push(makeRow(start + i));
+    saveToday();
+    buildTable();
+    alert("✅ Cargado rango de 100 garrones.");
+  }
+
+  function addOneRow(){
+    if(!today.rows) today.rows = [];
+    let next = 1;
+    if(today.rows.length) next = today.rows[today.rows.length-1].g + 1;
+    else{
+      const start = Number(document.getElementById("inStart").value || 0);
+      next = start > 0 ? start : 1;
+    }
+    today.rows.push(makeRow(next));
+    saveToday();
+    buildTable();
+  }
+
+  function buildTable(){
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
+    if(!today.rows) today.rows = [];
+
+    today.rows.forEach((r, idx)=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${r.g}</b></td>
+        ${mkSel("p1", idx, r.p1)}
+        ${mkSel("p2", idx, r.p2)}
+        ${mkSel("fa", idx, r.fa)}
+        ${mkSel("p3", idx, r.p3)}
+        <td><textarea data-k="obs" data-idx="${idx}" placeholder="Opcional"></textarea></td>
+      `;
+      tbody.appendChild(tr);
+
+      const tx = tr.querySelector('textarea');
+      tx.value = r.obs || "";
+      tx.addEventListener("input", onInput);
+
+      tr.querySelectorAll("select[data-k]").forEach(sel=>{
+        sel.value = today.rows[idx][sel.dataset.k] || "A";
+      });
+    });
+
+    renderSummary();
+  }
+
+  function mkSel(key, idx, val){
+    const pillClass = (val === "NC") ? "pill nc" : "pill ok";
+    return `
+      <td>
+        <select data-k="${key}" data-idx="${idx}">
+          <option value="A">A</option>
+          <option value="NC">NC</option>
+        </select>
+        <div style="margin-top:6px;"><span class="${pillClass}" id="pill-${key}-${idx}">${val}</span></div>
+      </td>
+    `;
+  }
+
+  document.addEventListener("change", (e)=>{
+    if(e.target && e.target.matches("select[data-k]")){
+      const idx = Number(e.target.dataset.idx);
+      const key = e.target.dataset.k;
+      today.rows[idx][key] = e.target.value;
+      saveToday();
+      updatePill(key, idx, e.target.value);
+      renderSummary();
+    }
+  });
+
+  function onInput(e){
+    const idx = Number(e.target.dataset.idx);
+    const key = e.target.dataset.k;
+    today.rows[idx][key] = e.target.value;
+    saveToday();
+  }
+
+  function updatePill(key, idx, val){
+    const pill = document.getElementById(`pill-${key}-${idx}`);
+    if(!pill) return;
+    pill.className = (val === "NC") ? "pill nc" : "pill ok";
+    pill.textContent = val;
+  }
+
+  function hasNC(r){
+    return [r.p1,r.p2,r.fa,r.p3].includes("NC");
+  }
+
+  function renderSummary(){
+    const total = (today.rows || []).length;
+    const ncCount = (today.rows || []).filter(hasNC).length;
+    const pct = total ? Math.round((ncCount/total)*100) : 0;
+    document.getElementById("sumText").innerHTML =
+      `Registros: <b>${total}</b> · Con NC: <b>${ncCount}</b> (${pct}%)`;
+
+    const ncBody = document.getElementById("ncBody");
+    ncBody.innerHTML = "";
+    const ncs = (today.rows || []).filter(hasNC);
+
+    if(!ncs.length){
+      ncBody.innerHTML = `<tr><td colspan="6" class="small">Sin NC cargadas.</td></tr>`;
+      return;
+    }
+
+    ncs.forEach(r=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${r.g}</b></td>
+        <td>${r.p1}</td>
+        <td>${r.p2}</td>
+        <td>${r.fa}</td>
+        <td>${r.p3}</td>
+        <td>${esc(r.obs || "")}</td>
+      `;
+      ncBody.appendChild(tr);
+    });
+  }
+
+  function finalizeDay(){
+    const fecha = document.getElementById("inFecha").value || new Date().toISOString().slice(0,10);
+
+    today.inspector = document.getElementById("inInspector").value || "";
+    today.verif = document.getElementById("inVerif").value || "";
+    today.fecha = fecha;
+    saveToday();
+
+    if(!today.inspector || !today.verif){
+      if(!confirm("Faltan Inspector o Verificación. ¿Igual querés finalizar el día?")) return;
+    }
+
+    const snapshot = JSON.parse(JSON.stringify(today));
+    snapshot.closedAt = new Date().toISOString();
+
+    finals = finals.filter(x => x.fecha !== fecha);
+    finals.unshift(snapshot);
+    saveFinals();
+
+    alert("✅ Día finalizado. Lo tenés en 'DÍAS FINALIZADOS'.");
+    renderFinals();
+  }
+
+  function renderFinals(){
+    const tbody = document.getElementById("finalBody");
+    tbody.innerHTML = "";
+
+    if(!finals.length){
+      tbody.innerHTML = `<tr><td colspan="4" class="small">Todavía no finalizaste ningún día.</td></tr>`;
+      return;
+    }
+
+    finals.forEach((f, idx)=>{
+      const ncCount = (f.rows || []).filter(hasNC).length;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${esc(f.fecha || "")}</b></td>
+        <td>${esc(f.inspector || "")}</td>
+        <td>${ncCount ? `<span class="pill nc">${ncCount} con NC</span>` : `<span class="pill ok">Sin NC</span>`}</td>
+        <td>
+          <button class="btn-mini gray" onclick="loadFinal(${idx})">Cargar</button>
+          <button class="btn-mini" onclick="printFinal(${idx})">PDF</button>
+          <button class="btn-mini danger" onclick="deleteFinal('${escAttr(f.fecha||"")}')">Borrar</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function loadFinal(idx){
+    if(!finals[idx]) return;
+    today = JSON.parse(JSON.stringify(finals[idx]));
+    saveToday();
+    location.reload();
+  }
+
+  function deleteFinal(fecha){
+    if(!confirm("¿Borrar ese día finalizado?")) return;
+    finals = finals.filter(x => x.fecha !== fecha);
+    saveFinals();
+    renderFinals();
+  }
+
+  function printFinal(idx){
+    if(!finals[idx]) return;
+    buildPrint(finals[idx]);
+    window.print();
+  }
+
+  function printPDF(){
+    today.inspector = document.getElementById("inInspector").value || "";
+    today.verif = document.getElementById("inVerif").value || "";
+    saveToday();
+    buildPrint(today);
+    window.print();
+  }
+
+  function buildPrint(obj){
+    const area = document.getElementById("print-area");
+    const rows = (obj.rows || []).map(r => `
+      <tr>
+        <td><b>${r.g}</b></td>
+        <td style="text-align:center;"><b>${r.p1}</b></td>
+        <td style="text-align:center;"><b>${r.p2}</b></td>
+        <td style="text-align:center;"><b>${r.fa}</b></td>
+        <td style="text-align:center;"><b>${r.p3}</b></td>
+        <td>${esc(r.obs || "")}</td>
+      </tr>
+    `).join("");
+
+    area.innerHTML = `
+      <div class="encabezado">
+        <table>
+          <tr>
+            <td class="logo"><img src="logo.jpg" alt="Logo"/></td>
+            <td class="titulo">
+              <strong>CHECK LIST</strong><br>
+              BIENESTAR ANIMAL EN FAENA KOSHER<br>
+              <span style="font-weight:1000;">ISRAEL</span>
+            </td>
+            <td class="info">
+              <div><b>Circular:</b> 4170 A</div>
+              <div><b>Código:</b> R-BA-001-6</div>
+              <div><b>Emisión:</b> Junio / 2024</div>
+              <div><b>Rev:</b> 03</div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="margin:10px 0; font-size:12pt;">
+        <b>Fecha de faena:</b> ${esc(obj.fecha || "")}
+      </div>
+
+      <table class="print-table" style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="width:90px;">Garrón</th>
+            <th style="width:70px;">P1</th>
+            <th style="width:70px;">P2</th>
+            <th style="width:70px;">FA</th>
+            <th style="width:70px;">P3</th>
+            <th>Obs</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+
+      <div style="margin-top:14px; display:flex; justify-content:space-between; gap:20px;">
+        <div style="width:48%; border-top:2px solid #111; padding-top:6px;">
+          <b>Inspector:</b> ${esc(obj.inspector || "")}
+        </div>
+        <div style="width:48%; border-top:2px solid #111; padding-top:6px;">
+          <b>Verificación:</b> ${esc(obj.verif || "")}
+        </div>
+      </div>
+
+      <div style="margin-top:12px; font-size:11pt;">
+        <b>Referencias:</b> A = Aceptable · NC = No conforme
+      </div>
+    `;
+  }
+
+  // BACKUP
+  function downloadBackup(){
+    const payload = { version:"ba_kosher_backup_v3", exportedAt:new Date().toISOString(), today, finals };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    const fecha = (today.fecha || new Date().toISOString().slice(0,10)).replaceAll("-","");
+    a.href = URL.createObjectURL(blob);
+    a.download = `R-BA-001-6_${fecha}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function triggerImport(){ document.getElementById("importFile").click(); }
+
+  document.getElementById("importFile").addEventListener("change", async (e)=>{
+    const f = e.target.files?.[0];
+    if(!f) return;
+    try{
+      const txt = await f.text();
+      const payload = JSON.parse(txt);
+      if(payload.version !== "ba_kosher_backup_v3") throw new Error("Formato no válido.");
+      today = payload.today || loadToday();
+      finals = payload.finals || loadFinals();
+      saveToday(); saveFinals();
+      alert("✅ Importado OK.");
+      location.reload();
+    }catch(err){
+      alert("❌ No pude importar: " + err.message);
+    }finally{
+      e.target.value = "";
+    }
+  });
+
+  function clearToday(){
+    if(!confirm("¿Borrar el día actual? (No borra finalizados)")) return;
+    localStorage.removeItem(KEY_TODAY);
+    today = loadToday();
+    location.reload();
+  }
+
+  // STORAGE
+  function loadToday(){
+    try{
+      return JSON.parse(localStorage.getItem(KEY_TODAY)) || { fecha:"", start:"", inspector:"", verif:"", rows:[] };
+    }catch{
+      return { fecha:"", start:"", inspector:"", verif:"", rows:[] };
+    }
+  }
+  function saveToday(){ localStorage.setItem(KEY_TODAY, JSON.stringify(today)); }
+
+  function loadFinals(){
+    try{ return JSON.parse(localStorage.getItem(KEY_FINAL)) || []; }catch{ return []; }
+  }
+  function saveFinals(){ localStorage.setItem(KEY_FINAL, JSON.stringify(finals)); }
+
+  // ESCAPE
+  function esc(s){ return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
+  function escAttr(s){ return String(s ?? "").replaceAll("'","&#39;").replaceAll('"',"&quot;"); }
+</script>
+
+</body>
+</html>
