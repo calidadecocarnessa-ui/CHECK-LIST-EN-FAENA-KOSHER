@@ -106,9 +106,7 @@
     <table>
       <tr>
         <td class="logo">
-          <img src="logo.jpg"
-               onerror="this.onerror=null; this.src='logo.png';"
-               alt="Logo">
+          <img src="logo.jpg" onerror="this.onerror=null; this.src='logo.png';" alt="Logo">
         </td>
         <td class="titulo">
           <div><strong>CHECK LIST</strong></div>
@@ -127,8 +125,8 @@
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="openTab(event,'tab-reg')">REGISTRO</button>
-    <button class="tab-btn" onclick="openTab(event,'tab-days')">DÍAS FINALIZADOS</button>
+    <button class="tab-btn active" onclick="openTab('tab-reg', this)">REGISTRO</button>
+    <button class="tab-btn" onclick="openTab('tab-days', this)">DÍAS FINALIZADOS</button>
   </div>
 
   <div id="tab-reg" class="tab-content active">
@@ -172,7 +170,7 @@
           <input type="number" id="in-garron" placeholder="Ej: 51" />
         </div>
 
-        <!-- ✅ ahora arrancan sin seleccionar -->
+        <!-- SIN PREDETERMINADO -->
         <div class="row">
           <label>P1</label>
           <select id="in-p1">
@@ -257,20 +255,8 @@
       </table>
     </div>
 
-    <div class="card" style="margin-top:10px;">
-      <div style="font-weight:900; margin-bottom:6px;">Referencias</div>
-      <div style="color:var(--muted); font-size:13px; line-height:1.35;">
-        A = Aceptable · NC = No Conforme<br>
-        P1: Tiempo desde contención al degüello (hasta 10 segundos)<br>
-        P2: Liberación de accionamientos de sujeción del cajón post degüello<br>
-        FA: Falso aneurisma<br>
-        P3: Liberación del animal de cajón rotatorio (mínimo 30 segundos)
-      </div>
-    </div>
-
   </div>
 
-  <!-- TAB DÍAS FINALIZADOS -->
   <div id="tab-days" class="tab-content">
     <div class="card">
       <div style="font-weight:900; margin-bottom:6px;">Días guardados</div>
@@ -298,13 +284,31 @@
 </div>
 
 <script>
-  const LS_DAYS = "ba_kosher_days_v2";
-  const LS_CURR = "ba_kosher_current_v2";
+  const LS_DAYS = "ba_kosher_days_v3";
+  const LS_CURR = "ba_kosher_current_v3";
 
   let current = null;
 
   function uid(){
     return "D" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  }
+
+  function esc(s){
+    s = String(s == null ? "" : s);
+    return s
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#039;");
+  }
+
+  function openTab(id, btn){
+    document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    btn.classList.add("active");
+    if(id === "tab-days") renderDays();
   }
 
   function loadDays(){
@@ -314,7 +318,6 @@
   function saveDays(days){
     localStorage.setItem(LS_DAYS, JSON.stringify(days));
   }
-
   function saveCurrent(){
     localStorage.setItem(LS_CURR, JSON.stringify(current));
   }
@@ -325,23 +328,7 @@
     }catch(e){ return null; }
   }
 
-  function openTab(evt, id){
-    document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
-    document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-    evt.currentTarget.classList.add("active");
-    if(id === "tab-days") renderDays();
-  }
-
-  function esc(s){
-    return String(s ?? "")
-      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
-  }
-
-  function anyNC(p1,p2,fa,p3){
-    return [p1,p2,fa,p3].some(x => x === "NC");
-  }
+  function anyNC(p1,p2,fa,p3){ return [p1,p2,fa,p3].some(x => x === "NC"); }
 
   function syncNcPanel(){
     const p1 = document.getElementById("in-p1").value;
@@ -378,7 +365,6 @@
     syncNcPanel();
   }
 
-  // ✅ Validación: no deja agregar si P1/P2/FA/P3 están sin elegir
   function validatePicks(){
     const p1 = document.getElementById("in-p1").value;
     const p2 = document.getElementById("in-p2").value;
@@ -395,16 +381,13 @@
     if(!current) nuevoDia();
     readHeaderFields();
 
-    const g = (document.getElementById("in-garron").value || "").trim();
-    if(!g){
-      alert("Falta Garrón.");
-      return;
-    }
+    const g = String(document.getElementById("in-garron").value || "").trim();
+    if(!g){ alert("Falta Garrón."); return; }
 
     const picks = validatePicks();
     if(!picks) return;
 
-    const {p1,p2,fa,p3} = picks;
+    const p1=picks.p1, p2=picks.p2, fa=picks.fa, p3=picks.p3;
 
     const row = {
       id: uid(),
@@ -424,15 +407,21 @@
 
   function renderTable(){
     const tb = document.getElementById("tbody");
-    const rows = (current?.rows || []).slice().sort((a,b)=> Number(a.garron) - Number(b.garron));
+    const rows = (current && current.rows ? current.rows.slice() : [])
+      .sort((a,b)=> Number(a.garron) - Number(b.garron));
 
-    const pill = (v)=>{
-      if(v === "NC") return `<span class="pill-nc">NC</span>`;
-      if(v === "A") return `<span class="pill-a">A</span>`;
-      return `<span class="pill-na">—</span>`;
-    };
+    function pill(v){
+      if(v === "NC") return '<span class="pill-nc">NC</span>';
+      if(v === "A") return '<span class="pill-a">A</span>';
+      return '<span class="pill-na">—</span>';
+    }
 
-    tb.innerHTML = rows.map(r=>`
+    if(rows.length === 0){
+      tb.innerHTML = '<tr><td colspan="6" style="color:#6b7280;">Sin registros todavía.</td></tr>';
+      return;
+    }
+
+    tb.innerHTML = rows.map(r => `
       <tr>
         <td><b>${esc(r.garron)}</b></td>
         <td>${pill(r.p1)}</td>
@@ -445,10 +434,6 @@
         </td>
       </tr>
     `).join("");
-
-    if(rows.length === 0){
-      tb.innerHTML = `<tr><td colspan="6" style="color:var(--muted);">Sin registros todavía.</td></tr>`;
-    }
   }
 
   function borrarFila(id){
@@ -469,15 +454,13 @@
     document.getElementById("in-p2").value = r.p2 || "";
     document.getElementById("in-fa").value = r.fa || "";
     document.getElementById("in-p3").value = r.p3 || "";
-
     document.getElementById("in-nc").value = r.nc || "";
     document.getElementById("in-ac").value = r.ac || "";
     document.getElementById("in-ap").value = r.ap || "";
     document.getElementById("in-enc").value = r.enc || "";
-
     syncNcPanel();
 
-    if(confirm("Editar esta fila: OK = se reemplaza cuando vuelvas a tocar AGREGAR.")){
+    if(confirm("OK = se reemplaza cuando toques AGREGAR.")){
       current.rows = current.rows.filter(x=>x.id!==id);
       saveCurrent();
       renderTable();
@@ -498,15 +481,6 @@
     fillHeaderFields();
     renderTable();
     limpiarCarga();
-
-    // enganchar change listeners (una vez)
-    ["in-p1","in-p2","in-fa","in-p3"].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el && !el.dataset.bound){
-        el.addEventListener("change", syncNcPanel);
-        el.dataset.bound = "1";
-      }
-    });
   }
 
   function borrarDiaActual(){
@@ -520,15 +494,8 @@
   function finalizarDia(){
     if(!current) return;
     readHeaderFields();
-
-    if(!current.fecha){
-      alert("Falta la fecha de faena.");
-      return;
-    }
-    if(current.rows.length === 0){
-      alert("No hay registros cargados.");
-      return;
-    }
+    if(!current.fecha){ alert("Falta la fecha de faena."); return; }
+    if(current.rows.length === 0){ alert("No hay registros cargados."); return; }
 
     const days = loadDays();
     current.finalized = true;
@@ -545,6 +512,11 @@
     const days = loadDays();
     const body = document.getElementById("daysBody");
 
+    if(days.length === 0){
+      body.innerHTML = '<tr><td colspan="5" style="color:#6b7280;">Todavía no hay días finalizados.</td></tr>';
+      return;
+    }
+
     body.innerHTML = days.map(d => `
       <tr>
         <td><b>${esc(d.fecha)}</b></td>
@@ -558,10 +530,6 @@
         </td>
       </tr>
     `).join("");
-
-    if(days.length === 0){
-      body.innerHTML = `<tr><td colspan="5" style="color:var(--muted);">Todavía no hay días finalizados.</td></tr>`;
-    }
   }
 
   function reabrirDia(id){
@@ -575,10 +543,8 @@
     renderTable();
     limpiarCarga();
 
-    document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
-    document.getElementById("tab-reg").classList.add("active");
-    document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
-    document.querySelectorAll(".tab-btn")[0].classList.add("active");
+    // vuelve a REGISTRO
+    openTab('tab-reg', document.querySelectorAll('.tab-btn')[0]);
   }
 
   function borrarDia(id){
@@ -607,16 +573,14 @@
   function printObject(d){
     const rows = (d.rows || []).slice().sort((a,b)=> Number(a.garron) - Number(b.garron));
     const ncRows = rows.filter(r => anyNC(r.p1,r.p2,r.fa,r.p3));
-    const pillText = (v)=> (v || "—");
+    const pillText = (v)=> (v ? v : "—");
 
     const html = `
       <div class="print-page">
         <div class="encabezado">
           <table>
             <tr>
-              <td class="logo">
-                <img src="logo.jpg" onerror="this.onerror=null; this.src='logo.png';" alt="Logo">
-              </td>
+              <td class="logo"><img src="logo.jpg" onerror="this.onerror=null; this.src='logo.png';" alt="Logo"></td>
               <td class="titulo">
                 <div><strong>CHECK LIST</strong></div>
                 <div><strong>BIENESTAR ANIMAL EN FAENA KOSHER</strong></div>
@@ -693,50 +657,32 @@
     `;
 
     const w = window.open("", "_blank");
-    w.document.write(`
-      <html>
-      <head>
-        <meta charset="UTF-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>PDF Bienestar Animal</title>
-        <style>
-          body{ font-family: Arial, sans-serif; margin:0; padding:0; }
-          .encabezado table{ width:100%; border-collapse: collapse; }
-          .encabezado td{ border:2px solid #000; padding:8px; vertical-align:middle; }
-          .encabezado .logo{ width:20%; text-align:center; }
-          .encabezado .logo img{ width:110px; max-width:100%; height:auto; }
-          .encabezado .titulo{ width:60%; text-align:center; font-size:13px; line-height:1.25; }
-          .encabezado .info{ width:20%; text-align:center; font-size:12px; background:#dff3ff; line-height:1.25; }
-          .print-page{ padding: 8mm; }
-          .sign{ margin-top:16px; display:flex; justify-content:space-between; gap:18px; }
-          .line{ flex:1; border-top: 2px solid #000; padding-top:6px; text-align:center; font-weight:800; }
-          @page { margin: 10mm; }
-        </style>
-      </head>
-      <body>
-        ${html}
-        <script>window.onload = () => { window.print(); }<\/script>
-      </body>
-      </html>
-    `);
+    w.document.write(
+      '<html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>'
+      +'<title>PDF Bienestar Animal</title>'
+      +'<style>body{font-family:Arial,sans-serif;margin:0;padding:0}.encabezado table{width:100%;border-collapse:collapse}.encabezado td{border:2px solid #000;padding:8px;vertical-align:middle}.encabezado .logo{width:20%;text-align:center}.encabezado .logo img{width:110px;max-width:100%;height:auto}.encabezado .titulo{width:60%;text-align:center;font-size:13px;line-height:1.25}.encabezado .info{width:20%;text-align:center;font-size:12px;background:#dff3ff;line-height:1.25}.print-page{padding:8mm}.sign{margin-top:16px;display:flex;justify-content:space-between;gap:18px}.line{flex:1;border-top:2px solid #000;padding-top:6px;text-align:center;font-weight:800}@page{margin:10mm}</style>'
+      +'</head><body>'
+      + html
+      + '<script>window.onload=function(){window.print();};<\/script>'
+      +'</body></html>'
+    );
     w.document.close();
   }
 
-  window.onload = () => {
+  window.onload = function(){
     current = loadCurrent();
     if(!current){
       nuevoDia();
-    } else {
+    }else{
       fillHeaderFields();
       renderTable();
       limpiarCarga();
     }
 
-    ["in-p1","in-p2","in-fa","in-p3"].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el && !el.dataset.bound){
+    ["in-p1","in-p2","in-fa","in-p3"].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el){
         el.addEventListener("change", syncNcPanel);
-        el.dataset.bound = "1";
       }
     });
 
