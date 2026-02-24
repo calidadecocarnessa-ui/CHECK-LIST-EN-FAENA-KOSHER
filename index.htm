@@ -196,7 +196,7 @@
   th{ background:#f1f5f9; position:sticky; top:0; z-index:2; }
   .colG{ width:90px; }
   .colP{ width:110px; }
-  .colObs{ min-width:340px; }
+  .colObs{ min-width:380px; }
 
   .pill{
     display:inline-flex;
@@ -213,9 +213,7 @@
   .pillNC{ background:#fee2e2; color:#7f1d1d; }
   .pillEmpty{ background:#e2e8f0; color:#0f172a; }
 
-  .miniRow{
-    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
-  }
+  .miniRow{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
   .miniBtn{
     border:none; border-radius:10px;
     padding:10px 12px;
@@ -224,6 +222,28 @@
   }
   .miniBtn.gray{ background:#e2e8f0; color:#0f172a; }
   .miniBtn.red{ background: var(--red); color:#fff; }
+
+  /* NC panel inside row */
+  .ncBox{
+    margin-top:10px;
+    border:1px dashed #fca5a5;
+    background:#fff1f2;
+    padding:10px;
+    border-radius:12px;
+  }
+  .ncTitle{
+    font-weight:900;
+    color:#7f1d1d;
+    margin-bottom:8px;
+  }
+  .ncGrid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:10px;
+  }
+  @media (max-width: 900px){
+    .ncGrid{ grid-template-columns: 1fr; }
+  }
 
   /* Tabs content */
   .tab{ display:none; }
@@ -318,7 +338,7 @@
             <th class="colP">P2</th>
             <th class="colP">FA</th>
             <th class="colP">P3</th>
-            <th class="colObs">OBSERVACIONES</th>
+            <th class="colObs">OBSERVACIONES / ACCIONES</th>
             <th class="noPrint">ACCIONES</th>
           </tr>
         </thead>
@@ -361,7 +381,10 @@
             <tr>
               <th class="colG">GARRÓN</th>
               <th>P1</th><th>P2</th><th>FA</th><th>P3</th>
-              <th>OBSERVACIONES</th>
+              <th>Detalle NC</th>
+              <th>Acción Correctiva</th>
+              <th>Acción Preventiva</th>
+              <th>Responsable</th>
             </tr>
           </thead>
           <tbody id="ncBody"></tbody>
@@ -401,8 +424,8 @@
   /* =========================
      STORAGE
   ========================= */
-  const LS_CURR = "ba_kosher_current_v4";
-  const LS_DAYS = "ba_kosher_days_v4";
+  const LS_CURR = "ba_kosher_current_v5";
+  const LS_DAYS = "ba_kosher_days_v5";
 
   let current = null;
 
@@ -442,7 +465,6 @@
   }
 
   function toggleTema(){
-    // Alterna un tema simple (claro/oscuro) si querés
     const dark = document.body.dataset.dark === "1";
     document.body.dataset.dark = dark ? "0" : "1";
     if(!dark){
@@ -520,7 +542,6 @@
   ========================= */
   function parseRangoStart(){
     const raw = (document.getElementById("in-rango").value || "").trim();
-    // acepta "1-50" o "1"
     const m = raw.match(/^(\d+)\s*(?:-\s*\d+)?$/);
     if(!m) return null;
     return Number(m[1]);
@@ -539,7 +560,12 @@
       p2: "",
       fa: "",
       p3: "",
-      obs: ""
+      obs: "",
+      // NC + Acciones
+      nc: "",
+      ac: "",
+      ap: "",
+      enc: ""
     });
   }
 
@@ -549,7 +575,6 @@
     const start = parseRangoStart();
     if(start == null){ alert("Rango inválido. Ej: 1-50 o 1"); return; }
 
-    // agrega 100 garrones consecutivos desde start
     let added = 0;
     for(let i=0; i<100; i++){
       const g = start + i;
@@ -566,7 +591,7 @@
   function agregarUno(){
     if(!current) newDay();
     readHeader();
-    // elige el mayor garron + 1, o el start si no hay
+
     const start = parseRangoStart() ?? 1;
     let next = start;
 
@@ -588,11 +613,20 @@
     renderTable();
   }
 
+  // Importante: si cambian P1/P2/FA/P3 re-render para mostrar/ocultar bloque NC
   function updateField(id, key, value){
     const r = current.rows.find(x => x.id === id);
     if(!r) return;
     r[key] = value;
     saveCurrent();
+
+    if(["p1","p2","fa","p3"].includes(key)){
+      renderTable();
+      // si estoy mirando resumen, también refresca
+      if(document.getElementById("tab-resumen").classList.contains("active")){
+        renderResumen();
+      }
+    }
   }
 
   function renderTable(){
@@ -645,7 +679,38 @@
         </td>
 
         <td>
-          <textarea placeholder="Opcional" oninput="updateField('${r.id}','obs',this.value)">${esc(r.obs||"")}</textarea>
+          <textarea placeholder="Opcional"
+            oninput="updateField('${r.id}','obs',this.value)">${esc(r.obs||"")}</textarea>
+
+          ${ anyNC(r) ? `
+            <div class="ncBox">
+              <div class="ncTitle">NC DETECTADA (completar)</div>
+
+              <div class="ncGrid">
+                <div>
+                  <label>Detalle de la no conformidad</label>
+                  <textarea placeholder="Detalle"
+                    oninput="updateField('${r.id}','nc',this.value)">${esc(r.nc||"")}</textarea>
+                </div>
+                <div>
+                  <label>Acción correctiva</label>
+                  <textarea placeholder="Acción inmediata / corrección"
+                    oninput="updateField('${r.id}','ac',this.value)">${esc(r.ac||"")}</textarea>
+                </div>
+                <div>
+                  <label>Acción preventiva</label>
+                  <textarea placeholder="Evitar recurrencia"
+                    oninput="updateField('${r.id}','ap',this.value)">${esc(r.ap||"")}</textarea>
+                </div>
+                <div>
+                  <label>Responsable</label>
+                  <input type="text" placeholder="Nombre o iniciales"
+                    value="${esc(r.enc||"")}"
+                    oninput="updateField('${r.id}','enc',this.value)">
+                </div>
+              </div>
+            </div>
+          ` : ``}
         </td>
 
         <td class="noPrint">
@@ -666,21 +731,20 @@
 
     if(!current || !current.rows.length){
       box.innerHTML = `<div style="color:var(--muted); font-weight:800;">Sin registros cargados.</div>`;
-      ncBody.innerHTML = `<tr><td colspan="6" style="color:var(--muted); font-weight:800;">Sin NC.</td></tr>`;
+      ncBody.innerHTML = `<tr><td colspan="9" style="color:var(--muted); font-weight:800;">Sin NC.</td></tr>`;
       return;
     }
 
     const rows = current.rows.slice().sort((a,b)=> Number(a.garron)-Number(b.garron));
-    const evalRows = rows.filter(completeRow); // solo filas completas
+    const evalRows = rows.filter(completeRow);
 
     const total = evalRows.length;
     const countField = (k, val) => evalRows.filter(r => r[k] === val).length;
 
-    const p1A = countField("p1","A"), p1NC = countField("p1","NC");
-    const p2A = countField("p2","A"), p2NC = countField("p2","NC");
-    const faA = countField("fa","A"), faNC = countField("fa","NC");
-    const p3A = countField("p3","A"), p3NC = countField("p3","NC");
-
+    const p1NC = countField("p1","NC");
+    const p2NC = countField("p2","NC");
+    const faNC = countField("fa","NC");
+    const p3NC = countField("p3","NC");
     const anyNcCount = evalRows.filter(anyNC).length;
 
     const pct = (n) => total ? Math.round((n/total)*100) : 0;
@@ -692,23 +756,16 @@
             <tr>
               <th>Ítem</th>
               <th>Total evaluado</th>
-              <th>A</th>
               <th>NC</th>
               <th>% NC</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td><b>P1</b></td><td>${total}</td><td>${p1A}</td><td>${p1NC}</td><td><b>${pct(p1NC)}%</b></td></tr>
-            <tr><td><b>P2</b></td><td>${total}</td><td>${p2A}</td><td>${p2NC}</td><td><b>${pct(p2NC)}%</b></td></tr>
-            <tr><td><b>FA</b></td><td>${total}</td><td>${faA}</td><td>${faNC}</td><td><b>${pct(faNC)}%</b></td></tr>
-            <tr><td><b>P3</b></td><td>${total}</td><td>${p3A}</td><td>${p3NC}</td><td><b>${pct(p3NC)}%</b></td></tr>
-            <tr>
-              <td><b>Filas con alguna NC</b></td>
-              <td>${total}</td>
-              <td>—</td>
-              <td>${anyNcCount}</td>
-              <td><b>${pct(anyNcCount)}%</b></td>
-            </tr>
+            <tr><td><b>P1</b></td><td>${total}</td><td>${p1NC}</td><td><b>${pct(p1NC)}%</b></td></tr>
+            <tr><td><b>P2</b></td><td>${total}</td><td>${p2NC}</td><td><b>${pct(p2NC)}%</b></td></tr>
+            <tr><td><b>FA</b></td><td>${total}</td><td>${faNC}</td><td><b>${pct(faNC)}%</b></td></tr>
+            <tr><td><b>P3</b></td><td>${total}</td><td>${p3NC}</td><td><b>${pct(p3NC)}%</b></td></tr>
+            <tr><td><b>Filas con alguna NC</b></td><td>${total}</td><td>${anyNcCount}</td><td><b>${pct(anyNcCount)}%</b></td></tr>
           </tbody>
         </table>
       </div>
@@ -719,7 +776,7 @@
 
     const ncRows = evalRows.filter(anyNC);
     if(!ncRows.length){
-      ncBody.innerHTML = `<tr><td colspan="6" style="color:var(--muted); font-weight:800;">Sin NC.</td></tr>`;
+      ncBody.innerHTML = `<tr><td colspan="9" style="color:var(--muted); font-weight:800;">Sin NC.</td></tr>`;
       return;
     }
 
@@ -730,7 +787,10 @@
         <td>${pill(r.p2)}</td>
         <td>${pill(r.fa)}</td>
         <td>${pill(r.p3)}</td>
-        <td>${esc(r.obs || "")}</td>
+        <td>${esc(r.nc || "")}</td>
+        <td>${esc(r.ac || "")}</td>
+        <td>${esc(r.ap || "")}</td>
+        <td>${esc(r.enc || "")}</td>
       </tr>
     `).join("");
   }
@@ -744,7 +804,6 @@
     if(!current.fecha){ alert("Falta Fecha de faena."); return; }
     if(!current.rows.length){ alert("No hay garrones cargados."); return; }
 
-    // Recomendación: exigir que al menos haya 1 fila completa
     const evalRows = current.rows.filter(completeRow);
     if(!evalRows.length){
       if(!confirm("No hay filas completas (P1/P2/FA/P3). ¿Finalizar igual?")) return;
@@ -753,7 +812,6 @@
     const days = loadDays();
     current.finalized = true;
 
-    // reemplaza si existe
     const idx = days.findIndex(d => d.id === current.id);
     if(idx >= 0) days[idx] = current;
     else days.unshift(current);
@@ -831,7 +889,6 @@
     const d = days.find(x => x.id === id);
     if(!d) return;
 
-    // Temporariamente setea current para imprimir igual pantalla (simple y efectivo)
     const backup = current;
     current = d;
     fillHeader();
@@ -839,7 +896,6 @@
     openTab("check");
     setTimeout(() => {
       window.print();
-      // volver
       current = backup;
       fillHeader();
       renderTable();
