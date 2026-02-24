@@ -3,630 +3,745 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>R-BA-001-6 | Check List Bienestar Animal Kosher</title>
+  <title>Check List Bienestar Animal - Kosher</title>
 
   <style>
     :root{
-      --bg:#f0f2f5; --card:#ffffff; --text:#111827; --muted:#6b7280;
-      --border:#e5e7eb; --accent:#2563eb; --danger:#ef4444; --ok:#16a34a;
-      --soft:#cbd5e1;
+      --bg:#f3f5f7; --card:#ffffff; --text:#111827; --muted:#6b7280;
+      --accent:#2563eb; --border:#e5e7eb; --danger:#dc2626;
     }
-    body.dark{ --bg:#0f172a; --card:#1e293b; --text:#f8fafc; --muted:#94a3b8; --border:#334155; --soft:#334155; }
-    body{ margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text); padding:10px; }
+    body{ margin:0; background:var(--bg); color:var(--text); font-family: Arial, sans-serif; padding:12px; }
+    .wrap{ max-width: 1100px; margin:0 auto; }
 
-    /* Encabezado estilo planilla */
-    .encabezado{ background:#e5e7eb; border:2px solid #111; margin-bottom:10px; }
-    .encabezado table{ width:100%; border-collapse:collapse; }
-    .encabezado td{ border:2px solid #111; padding:8px; vertical-align:middle; }
-    .encabezado .logo{ width:180px; text-align:center; background:#f3f4f6; }
-    .encabezado .logo img{ max-height:70px; max-width:160px; object-fit:contain; display:block; margin:0 auto; }
-    .encabezado .titulo{ text-align:center; font-size:13px; line-height:1.25; }
-    .encabezado .titulo strong{ font-size:14px; }
-    .encabezado .info{ width:260px; font-size:12px; background:#dbeafe; line-height:1.25; }
+    .encabezado table{ width:100%; border-collapse: collapse; background:#fff; }
+    .encabezado td{ border:2px solid #000; padding:8px; vertical-align:middle; }
+    .encabezado .logo{ width:20%; text-align:center; }
+    .encabezado .logo img{ width:110px; max-width:100%; height:auto; }
+    .encabezado .titulo{ width:60%; text-align:center; font-size:13px; line-height:1.25; }
+    .encabezado .info{ width:20%; text-align:center; font-size:12px; background:#dff3ff; line-height:1.25; }
 
-    /* Tabs */
-    .tabs{ display:flex; gap:6px; margin-bottom:10px; }
+    .tabs{ display:flex; gap:8px; margin:10px 0; }
     .tab-btn{
-      flex:1; padding:12px; border:none; border-radius:12px; font-weight:900; cursor:pointer;
-      background:var(--soft); color:#334155;
+      flex:1; padding:12px; border:none; border-radius:10px; cursor:pointer;
+      background:#cbd5e1; font-weight:700; color:#334155;
     }
-    body.dark .tab-btn{ color:#e2e8f0; }
     .tab-btn.active{ background:var(--accent); color:#fff; }
     .tab-content{ display:none; }
     .tab-content.active{ display:block; }
 
-    /* Toolbar */
     .toolbar{
-      display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;
-      background:var(--card); border:1px solid var(--border); border-radius:14px; padding:10px;
+      display:flex; gap:8px; flex-wrap:wrap;
+      background:var(--card); border:1px solid var(--border);
+      border-radius:14px; padding:10px; margin-bottom:10px;
     }
     .toolbar button{
-      flex:1; min-width:150px; height:54px;
-      border:none; border-radius:12px; cursor:pointer; font-weight:900;
-      background:var(--accent); color:#fff;
+      flex:1; min-width:140px; height:52px; cursor:pointer; border:none;
+      border-radius:12px; background:var(--accent); color:#fff;
+      font-weight:800;
     }
+    .toolbar button.secondary{ background:#475569; }
     .toolbar button.danger{ background:var(--danger); }
-    .toolbar button.ok{ background:var(--ok); }
-    .toolbar button.gray{ background:#64748b; }
+    .toolbar .hint{ flex: 2; min-width: 220px; display:flex; align-items:center; color:var(--muted); font-size:12px; }
 
     .card{
-      background:var(--card); border:1px solid var(--border); border-radius:16px; padding:12px; margin-bottom:10px;
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; padding:12px; margin-bottom:10px;
     }
-    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    label{ font-size:11px; font-weight:900; color:var(--muted); text-transform:uppercase; }
+    .grid{
+      display:grid; grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: repeat(2, 1fr); }
+    }
+    .row{ display:flex; flex-direction:column; gap:6px; }
+    label{ font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; }
     input, select, textarea{
-      width:100%; box-sizing:border-box;
-      background:var(--bg); color:var(--text);
-      border:1px solid var(--border); border-radius:10px;
-      padding:10px; font-size:16px;
+      border:1px solid var(--border); background:var(--bg); color:var(--text);
+      border-radius:10px; padding:10px; font-size:15px; outline:none;
     }
-    textarea{ min-height:44px; resize:vertical; }
-    .small{ font-size:12px; color:var(--muted); }
+    textarea{ min-height:72px; resize:vertical; }
 
-    /* Tabla */
-    .table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:14px; background:var(--card); }
-    table{ width:100%; border-collapse:collapse; }
-    th, td{ border-bottom:1px solid var(--border); padding:10px; vertical-align:middle; }
-    th{ position:sticky; top:0; background:#e5e7eb; color:#111; font-size:12px; text-transform:uppercase; }
-    body.dark th{ background:#0b1220; color:#e5e7eb; }
+    .table-wrap{ background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:auto; }
+    table{ width:100%; border-collapse: collapse; }
+    th, td{ border-bottom:1px solid var(--border); padding:10px; text-align:left; font-size:14px; }
+    th{ background:#f1f5f9; position: sticky; top:0; z-index:1; }
 
-    .pill{
-      display:inline-block; padding:5px 10px; border-radius:999px;
-      font-size:12px; font-weight:1000; background:#e5e7eb; color:#111;
+    .pill-nc{ color:#fff; background:var(--danger); padding:2px 8px; border-radius:999px; font-size:12px; font-weight:800; }
+    .pill-a{ color:#fff; background:#16a34a; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:800; }
+    .pill-na{ color:#0f172a; background:#e2e8f0; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:800; }
+
+    .mini-btn{
+      border:none; border-radius:10px; padding:8px 10px; cursor:pointer;
+      font-weight:800;
     }
-    .pill.ok{ background:#dcfce7; color:#14532d; }
-    .pill.nc{ background:#fee2e2; color:#7f1d1d; }
+    .mini-btn.primary{ background:var(--accent); color:#fff; }
+    .mini-btn.gray{ background:#e2e8f0; color:#0f172a; }
+    .mini-btn.danger{ background:var(--danger); color:#fff; }
 
-    .btn-mini{
-      border:none; border-radius:10px; padding:9px 12px; cursor:pointer; font-weight:900;
-      background:var(--accent); color:#fff;
+    .nc-box{
+      margin-top:10px; border:1px dashed #fca5a5; background:#fff1f2;
+      border-radius:14px; padding:10px;
     }
-    .btn-mini.danger{ background:var(--danger); }
-    .btn-mini.gray{ background:#64748b; }
+    .nc-title{ font-weight:900; color:#7f1d1d; margin-bottom:8px; }
 
-    /* Impresión */
-    #print-area{ display:none; }
     @media print{
-      body{ padding:0; background:#fff; }
-      .tabs, .toolbar, .card, .table-wrap { display:none !important; }
-      #print-area{ display:block !important; }
-      @page{ size:A4 portrait; margin:0.8cm; }
-      .print-table th{ background:#e5e7eb !important; -webkit-print-color-adjust:exact; }
-      .print-table, .print-table th, .print-table td{ border:1px solid #111; }
-      .print-table th, .print-table td{ font-size:10pt; }
+      body{ background:#fff; padding:0; }
+      .tabs, .toolbar{ display:none !important; }
+      .card, .table-wrap{ border:none; }
+      th{ position:static; }
+      .no-print{ display:none !important; }
+      .print-page{ page-break-after: always; padding: 8mm; }
+      .print-page:last-child{ page-break-after: auto; }
+      .sign{ margin-top:16px; display:flex; justify-content:space-between; gap:18px; }
+      .line{ flex:1; border-top: 2px solid #000; padding-top:6px; text-align:center; font-weight:800; }
     }
   </style>
 </head>
 
 <body>
+<div class="wrap">
 
-  <!-- ENCABEZADO -->
   <div class="encabezado">
     <table>
       <tr>
         <td class="logo">
-          <img src="logo.jpg" alt="Logo"
-               onerror="this.style.display='none'; this.parentNode.innerHTML='(No se encontró logo.jpg)';" />
+          <img src="logo.jpg"
+               onerror="this.onerror=null; this.src='logo.png';"
+               alt="Logo">
         </td>
         <td class="titulo">
-          <strong>CHECK LIST</strong><br>
-          BIENESTAR ANIMAL EN FAENA KOSHER<br>
-          <span style="font-weight:1000;">ISRAEL</span>
+          <div><strong>CHECK LIST</strong></div>
+          <div><strong>BIENESTAR ANIMAL EN FAENA KOSHER</strong></div>
+          <div><strong>ISRAEL</strong></div>
+          <div style="margin-top:4px; color:#0b3d91; font-weight:900;">
+            Circular 4170 A &nbsp; | &nbsp; R-BA-001-6
+          </div>
         </td>
         <td class="info">
-          <div><b>Circular:</b> 4170 A</div>
-          <div><b>Código:</b> R-BA-001-6</div>
-          <div><b>Emisión:</b> Junio / 2024</div>
-          <div><b>Rev:</b> 03</div>
+          Emisión: Junio / 2024<br>
+          Rev: 03
         </td>
       </tr>
     </table>
   </div>
 
-  <!-- TABS -->
   <div class="tabs">
-    <button class="tab-btn active" onclick="openTab(event,'t1')">CHECKLIST</button>
-    <button class="tab-btn" onclick="openTab(event,'t2')">RESUMEN / NC</button>
-    <button class="tab-btn" onclick="openTab(event,'t3')">DÍAS FINALIZADOS</button>
+    <button class="tab-btn active" onclick="openTab(event,'tab-reg')">REGISTRO</button>
+    <button class="tab-btn" onclick="openTab(event,'tab-days')">DÍAS FINALIZADOS</button>
   </div>
 
-  <!-- TAB 1: CHECKLIST -->
-  <div id="t1" class="tab-content active">
+  <div id="tab-reg" class="tab-content active">
 
     <div class="toolbar">
-      <button class="gray" onclick="document.body.classList.toggle('dark')">TEMA</button>
-      <button onclick="printPDF()">PDF (IMPRIMIR)</button>
-      <button onclick="downloadBackup()">DESCARGAR RESPALDO</button>
-      <button onclick="triggerImport()">IMPORTAR RESPALDO</button>
-      <button class="ok" onclick="finalizeDay()">FINALIZAR DÍA</button>
-      <button class="danger" onclick="clearToday()">BORRAR DÍA</button>
+      <button onclick="nuevoDia()">NUEVO DÍA</button>
+      <button class="secondary" onclick="imprimirDiaActual()">PDF / IMPRIMIR</button>
+      <button onclick="finalizarDia()">FINALIZAR DÍA</button>
+      <button class="danger" onclick="borrarDiaActual()">BORRAR DÍA</button>
+      <div class="hint">
+        P1: contención→degüello (≤10s) · P2: liberación sujeción post degüello · FA: falso aneurisma · P3: liberar del cajón (≥30s)
+      </div>
     </div>
 
     <div class="card">
       <div class="grid">
-        <div>
+        <div class="row">
           <label>Fecha de faena</label>
-          <input type="date" id="inFecha">
+          <input type="date" id="in-fecha" />
         </div>
-        <div>
-          <label>Rango de garrón (inicio)</label>
-          <input type="number" id="inStart" min="1" placeholder="Ej: 1">
+        <div class="row">
+          <label>Animales a revisar</label>
+          <input type="text" id="in-animales" value="Todos los animales que integran la faena Kosher del día" />
+        </div>
+        <div class="row">
+          <label>Responsable (iniciales)</label>
+          <input type="text" id="in-resp" maxlength="4" placeholder="Ej: YA"
+                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z]/g,'')" />
+        </div>
+        <div class="row">
+          <label>Observaciones generales</label>
+          <input type="text" id="in-obs" placeholder="Opcional"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="grid">
+        <div class="row">
+          <label>Garrón</label>
+          <input type="number" id="in-garron" placeholder="Ej: 51" />
+        </div>
+
+        <!-- ✅ ahora arrancan sin seleccionar -->
+        <div class="row">
+          <label>P1</label>
+          <select id="in-p1">
+            <option value="">—</option>
+            <option value="A">A (Aceptable)</option>
+            <option value="NC">NC (No conforme)</option>
+          </select>
+        </div>
+        <div class="row">
+          <label>P2</label>
+          <select id="in-p2">
+            <option value="">—</option>
+            <option value="A">A (Aceptable)</option>
+            <option value="NC">NC (No conforme)</option>
+          </select>
+        </div>
+        <div class="row">
+          <label>FA</label>
+          <select id="in-fa">
+            <option value="">—</option>
+            <option value="A">A (Aceptable)</option>
+            <option value="NC">NC (No conforme)</option>
+          </select>
+        </div>
+        <div class="row">
+          <label>P3</label>
+          <select id="in-p3">
+            <option value="">—</option>
+            <option value="A">A (Aceptable)</option>
+            <option value="NC">NC (No conforme)</option>
+          </select>
+        </div>
+
+        <div class="row" style="grid-column: span 3;">
+          <label>Tolerancia cero</label>
+          <input type="text" value="IZADO DE ANIMALES CON SENSIBILIDAD" readonly />
         </div>
       </div>
 
-      <div style="display:flex; gap:10px; margin-top:10px;">
-        <button onclick="applyRange()" style="flex:1; height:52px; border:none; border-radius:12px; background:#0ea5e9; color:#fff; font-weight:1000;">
-          CARGAR 100 GARRONES (planilla)
-        </button>
-        <button onclick="addOneRow()" style="flex:1; height:52px; border:none; border-radius:12px; background:#16a34a; color:#fff; font-weight:1000;">
-          +1 GARRÓN
-        </button>
+      <div class="no-print" style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="mini-btn primary" onclick="agregarRegistro()">AGREGAR</button>
+        <button class="mini-btn gray" onclick="limpiarCarga()">LIMPIAR</button>
       </div>
 
-      <div class="small" style="margin-top:8px;">
-        P1: Tiempo desde contención al degüello (≤ 10 seg) ·
-        P2: Liberación accionamientos sujeción post degüello ·
-        FA: Falso aneurisma ·
-        P3: Liberación del animal del cajón rotatorio
+      <div id="nc-panel" class="nc-box" style="display:none;">
+        <div class="nc-title">NC DETECTADA (completar)</div>
+        <div class="grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="row">
+            <label>No conformidad</label>
+            <textarea id="in-nc"></textarea>
+          </div>
+          <div class="row">
+            <label>Acción correctiva</label>
+            <textarea id="in-ac"></textarea>
+          </div>
+          <div class="row">
+            <label>Acción preventiva</label>
+            <textarea id="in-ap"></textarea>
+          </div>
+          <div class="row">
+            <label>Encargado / Responsable</label>
+            <input type="text" id="in-enc" placeholder="Nombre o iniciales" />
+          </div>
+        </div>
       </div>
-      <div class="small">
-        Referencias: <b>A</b> = Aceptable · <b>NC</b> = No conforme
-      </div>
+
     </div>
 
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th style="width:90px;">Garrón</th>
-            <th style="width:120px;">P1</th>
-            <th style="width:120px;">P2</th>
-            <th style="width:120px;">FA</th>
-            <th style="width:120px;">P3</th>
-            <th>Observaciones</th>
+            <th>Garrón</th>
+            <th>P1</th>
+            <th>P2</th>
+            <th>FA</th>
+            <th>P3</th>
+            <th class="no-print">Acciones</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
 
-    <!-- Cierre -->
     <div class="card" style="margin-top:10px;">
-      <div style="font-weight:1000; margin-bottom:8px;">CIERRE DEL REGISTRO</div>
-      <div class="grid">
-        <div>
-          <label>Inspector</label>
-          <input type="text" id="inInspector" placeholder="Nombre y apellido">
-        </div>
-        <div>
-          <label>Verificación</label>
-          <input type="text" id="inVerif" placeholder="Nombre y apellido">
-        </div>
-      </div>
-      <div class="small" style="margin-top:8px;">
-        Completá al final y recién ahí tocá “Finalizar día”.
+      <div style="font-weight:900; margin-bottom:6px;">Referencias</div>
+      <div style="color:var(--muted); font-size:13px; line-height:1.35;">
+        A = Aceptable · NC = No Conforme<br>
+        P1: Tiempo desde contención al degüello (hasta 10 segundos)<br>
+        P2: Liberación de accionamientos de sujeción del cajón post degüello<br>
+        FA: Falso aneurisma<br>
+        P3: Liberación del animal de cajón rotatorio (mínimo 30 segundos)
       </div>
     </div>
 
   </div>
 
-  <!-- TAB 2: RESUMEN / NC -->
-  <div id="t2" class="tab-content">
+  <!-- TAB DÍAS FINALIZADOS -->
+  <div id="tab-days" class="tab-content">
     <div class="card">
-      <div style="font-weight:1000; margin-bottom:6px;">RESUMEN</div>
-      <div class="small" id="sumText">—</div>
-    </div>
-
-    <div class="card">
-      <div style="font-weight:1000; margin-bottom:6px;">LISTA DE NO CONFORMES (NC)</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:90px;">Garrón</th>
-              <th style="width:90px;">P1</th>
-              <th style="width:90px;">P2</th>
-              <th style="width:90px;">FA</th>
-              <th style="width:90px;">P3</th>
-              <th>Obs</th>
-            </tr>
-          </thead>
-          <tbody id="ncBody"></tbody>
-        </table>
+      <div style="font-weight:900; margin-bottom:6px;">Días guardados</div>
+      <div style="color:var(--muted); font-size:13px;">
+        Acá quedan los días “finalizados”. Podés reabrir para corregir o imprimir en PDF.
       </div>
-    </div>
-  </div>
-
-  <!-- TAB 3: DIAS FINALIZADOS -->
-  <div id="t3" class="tab-content">
-    <div class="card">
-      <div style="font-weight:1000; margin-bottom:6px;">DÍAS FINALIZADOS</div>
-      <div class="small">Acá te quedan guardados los registros “cerrados” para reimprimir o volver a cargar.</div>
     </div>
 
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th style="width:140px;">Fecha</th>
-            <th>Inspector</th>
-            <th style="width:160px;">NC</th>
-            <th style="width:260px;">Acciones</th>
+            <th>Fecha</th>
+            <th>Registros</th>
+            <th>Responsable</th>
+            <th>Obs</th>
+            <th class="no-print">Acciones</th>
           </tr>
         </thead>
-        <tbody id="finalBody"></tbody>
+        <tbody id="daysBody"></tbody>
       </table>
     </div>
   </div>
 
-  <div id="print-area"></div>
-  <input type="file" id="importFile" accept="application/json" style="display:none;" />
+</div>
 
 <script>
-  const KEY_TODAY = "ba_kosher_today_v3";
-  const KEY_FINAL = "ba_kosher_final_v3";
+  const LS_DAYS = "ba_kosher_days_v2";
+  const LS_CURR = "ba_kosher_current_v2";
 
-  let today = loadToday();
-  let finals = loadFinals();
+  let current = null;
+
+  function uid(){
+    return "D" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  }
+
+  function loadDays(){
+    try{ return JSON.parse(localStorage.getItem(LS_DAYS) || "[]"); }
+    catch(e){ return []; }
+  }
+  function saveDays(days){
+    localStorage.setItem(LS_DAYS, JSON.stringify(days));
+  }
+
+  function saveCurrent(){
+    localStorage.setItem(LS_CURR, JSON.stringify(current));
+  }
+  function loadCurrent(){
+    try{
+      const v = localStorage.getItem(LS_CURR);
+      return v ? JSON.parse(v) : null;
+    }catch(e){ return null; }
+  }
 
   function openTab(evt, id){
     document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
     document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
     document.getElementById(id).classList.add("active");
     evt.currentTarget.classList.add("active");
-    if(id === "t2") renderSummary();
-    if(id === "t3") renderFinals();
+    if(id === "tab-days") renderDays();
   }
 
-  window.onload = () => {
-    const iso = new Date().toISOString().slice(0,10);
-    document.getElementById("inFecha").value = today.fecha || iso;
-    document.getElementById("inStart").value = today.start || "";
-    document.getElementById("inInspector").value = today.inspector || "";
-    document.getElementById("inVerif").value = today.verif || "";
-
-    [["inFecha","fecha"],["inStart","start"],["inInspector","inspector"],["inVerif","verif"]].forEach(([id,key])=>{
-      document.getElementById(id).addEventListener("input", ()=>{
-        today[key] = document.getElementById(id).value;
-        saveToday();
-      });
-    });
-
-    buildTable();
-    renderSummary();
-    renderFinals();
-  };
-
-  function makeRow(g){
-    return { g: Number(g), p1:"A", p2:"A", fa:"A", p3:"A", obs:"" };
+  function esc(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
   }
 
-  function applyRange(){
-    const start = Number(document.getElementById("inStart").value || 0);
-    if(!start || start < 1){ alert("Poné el garrón inicial (ej: 1, 101, 201, 301)."); return; }
-    today.start = start;
-    today.rows = [];
-    for(let i=0;i<100;i++) today.rows.push(makeRow(start + i));
-    saveToday();
-    buildTable();
-    alert("✅ Cargado rango de 100 garrones.");
+  function anyNC(p1,p2,fa,p3){
+    return [p1,p2,fa,p3].some(x => x === "NC");
   }
 
-  function addOneRow(){
-    if(!today.rows) today.rows = [];
-    let next = 1;
-    if(today.rows.length) next = today.rows[today.rows.length-1].g + 1;
-    else{
-      const start = Number(document.getElementById("inStart").value || 0);
-      next = start > 0 ? start : 1;
+  function syncNcPanel(){
+    const p1 = document.getElementById("in-p1").value;
+    const p2 = document.getElementById("in-p2").value;
+    const fa = document.getElementById("in-fa").value;
+    const p3 = document.getElementById("in-p3").value;
+    document.getElementById("nc-panel").style.display = anyNC(p1,p2,fa,p3) ? "block" : "none";
+  }
+
+  function fillHeaderFields(){
+    document.getElementById("in-fecha").value = current.fecha || "";
+    document.getElementById("in-animales").value = current.animales || "";
+    document.getElementById("in-resp").value = current.resp || "";
+    document.getElementById("in-obs").value = current.obs || "";
+  }
+
+  function readHeaderFields(){
+    current.fecha = document.getElementById("in-fecha").value || "";
+    current.animales = document.getElementById("in-animales").value || "";
+    current.resp = (document.getElementById("in-resp").value || "").toUpperCase();
+    current.obs = document.getElementById("in-obs").value || "";
+  }
+
+  function limpiarCarga(){
+    document.getElementById("in-garron").value = "";
+    document.getElementById("in-p1").value = "";
+    document.getElementById("in-p2").value = "";
+    document.getElementById("in-fa").value = "";
+    document.getElementById("in-p3").value = "";
+    document.getElementById("in-nc").value = "";
+    document.getElementById("in-ac").value = "";
+    document.getElementById("in-ap").value = "";
+    document.getElementById("in-enc").value = "";
+    syncNcPanel();
+  }
+
+  // ✅ Validación: no deja agregar si P1/P2/FA/P3 están sin elegir
+  function validatePicks(){
+    const p1 = document.getElementById("in-p1").value;
+    const p2 = document.getElementById("in-p2").value;
+    const fa = document.getElementById("in-fa").value;
+    const p3 = document.getElementById("in-p3").value;
+    if(!p1 || !p2 || !fa || !p3){
+      alert("Falta seleccionar P1, P2, FA y P3 (A o NC).");
+      return null;
     }
-    today.rows.push(makeRow(next));
-    saveToday();
-    buildTable();
+    return {p1,p2,fa,p3};
   }
 
-  function buildTable(){
-    const tbody = document.getElementById("tbody");
-    tbody.innerHTML = "";
-    if(!today.rows) today.rows = [];
+  function agregarRegistro(){
+    if(!current) nuevoDia();
+    readHeaderFields();
 
-    today.rows.forEach((r, idx)=>{
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><b>${r.g}</b></td>
-        ${mkSel("p1", idx, r.p1)}
-        ${mkSel("p2", idx, r.p2)}
-        ${mkSel("fa", idx, r.fa)}
-        ${mkSel("p3", idx, r.p3)}
-        <td><textarea data-k="obs" data-idx="${idx}" placeholder="Opcional"></textarea></td>
-      `;
-      tbody.appendChild(tr);
-
-      const tx = tr.querySelector('textarea');
-      tx.value = r.obs || "";
-      tx.addEventListener("input", onInput);
-
-      tr.querySelectorAll("select[data-k]").forEach(sel=>{
-        sel.value = today.rows[idx][sel.dataset.k] || "A";
-      });
-    });
-
-    renderSummary();
-  }
-
-  function mkSel(key, idx, val){
-    const pillClass = (val === "NC") ? "pill nc" : "pill ok";
-    return `
-      <td>
-        <select data-k="${key}" data-idx="${idx}">
-          <option value="A">A</option>
-          <option value="NC">NC</option>
-        </select>
-        <div style="margin-top:6px;"><span class="${pillClass}" id="pill-${key}-${idx}">${val}</span></div>
-      </td>
-    `;
-  }
-
-  document.addEventListener("change", (e)=>{
-    if(e.target && e.target.matches("select[data-k]")){
-      const idx = Number(e.target.dataset.idx);
-      const key = e.target.dataset.k;
-      today.rows[idx][key] = e.target.value;
-      saveToday();
-      updatePill(key, idx, e.target.value);
-      renderSummary();
-    }
-  });
-
-  function onInput(e){
-    const idx = Number(e.target.dataset.idx);
-    const key = e.target.dataset.k;
-    today.rows[idx][key] = e.target.value;
-    saveToday();
-  }
-
-  function updatePill(key, idx, val){
-    const pill = document.getElementById(`pill-${key}-${idx}`);
-    if(!pill) return;
-    pill.className = (val === "NC") ? "pill nc" : "pill ok";
-    pill.textContent = val;
-  }
-
-  function hasNC(r){
-    return [r.p1,r.p2,r.fa,r.p3].includes("NC");
-  }
-
-  function renderSummary(){
-    const total = (today.rows || []).length;
-    const ncCount = (today.rows || []).filter(hasNC).length;
-    const pct = total ? Math.round((ncCount/total)*100) : 0;
-    document.getElementById("sumText").innerHTML =
-      `Registros: <b>${total}</b> · Con NC: <b>${ncCount}</b> (${pct}%)`;
-
-    const ncBody = document.getElementById("ncBody");
-    ncBody.innerHTML = "";
-    const ncs = (today.rows || []).filter(hasNC);
-
-    if(!ncs.length){
-      ncBody.innerHTML = `<tr><td colspan="6" class="small">Sin NC cargadas.</td></tr>`;
+    const g = (document.getElementById("in-garron").value || "").trim();
+    if(!g){
+      alert("Falta Garrón.");
       return;
     }
 
-    ncs.forEach(r=>{
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><b>${r.g}</b></td>
-        <td>${r.p1}</td>
-        <td>${r.p2}</td>
-        <td>${r.fa}</td>
-        <td>${r.p3}</td>
-        <td>${esc(r.obs || "")}</td>
-      `;
-      ncBody.appendChild(tr);
-    });
+    const picks = validatePicks();
+    if(!picks) return;
+
+    const {p1,p2,fa,p3} = picks;
+
+    const row = {
+      id: uid(),
+      garron: g,
+      p1, p2, fa, p3,
+      nc: anyNC(p1,p2,fa,p3) ? (document.getElementById("in-nc").value || "") : "",
+      ac: anyNC(p1,p2,fa,p3) ? (document.getElementById("in-ac").value || "") : "",
+      ap: anyNC(p1,p2,fa,p3) ? (document.getElementById("in-ap").value || "") : "",
+      enc: anyNC(p1,p2,fa,p3) ? (document.getElementById("in-enc").value || "") : ""
+    };
+
+    current.rows.push(row);
+    saveCurrent();
+    renderTable();
+    limpiarCarga();
   }
 
-  function finalizeDay(){
-    const fecha = document.getElementById("inFecha").value || new Date().toISOString().slice(0,10);
+  function renderTable(){
+    const tb = document.getElementById("tbody");
+    const rows = (current?.rows || []).slice().sort((a,b)=> Number(a.garron) - Number(b.garron));
 
-    today.inspector = document.getElementById("inInspector").value || "";
-    today.verif = document.getElementById("inVerif").value || "";
-    today.fecha = fecha;
-    saveToday();
+    const pill = (v)=>{
+      if(v === "NC") return `<span class="pill-nc">NC</span>`;
+      if(v === "A") return `<span class="pill-a">A</span>`;
+      return `<span class="pill-na">—</span>`;
+    };
 
-    if(!today.inspector || !today.verif){
-      if(!confirm("Faltan Inspector o Verificación. ¿Igual querés finalizar el día?")) return;
-    }
-
-    const snapshot = JSON.parse(JSON.stringify(today));
-    snapshot.closedAt = new Date().toISOString();
-
-    finals = finals.filter(x => x.fecha !== fecha);
-    finals.unshift(snapshot);
-    saveFinals();
-
-    alert("✅ Día finalizado. Lo tenés en 'DÍAS FINALIZADOS'.");
-    renderFinals();
-  }
-
-  function renderFinals(){
-    const tbody = document.getElementById("finalBody");
-    tbody.innerHTML = "";
-
-    if(!finals.length){
-      tbody.innerHTML = `<tr><td colspan="4" class="small">Todavía no finalizaste ningún día.</td></tr>`;
-      return;
-    }
-
-    finals.forEach((f, idx)=>{
-      const ncCount = (f.rows || []).filter(hasNC).length;
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><b>${esc(f.fecha || "")}</b></td>
-        <td>${esc(f.inspector || "")}</td>
-        <td>${ncCount ? `<span class="pill nc">${ncCount} con NC</span>` : `<span class="pill ok">Sin NC</span>`}</td>
-        <td>
-          <button class="btn-mini gray" onclick="loadFinal(${idx})">Cargar</button>
-          <button class="btn-mini" onclick="printFinal(${idx})">PDF</button>
-          <button class="btn-mini danger" onclick="deleteFinal('${escAttr(f.fecha||"")}')">Borrar</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function loadFinal(idx){
-    if(!finals[idx]) return;
-    today = JSON.parse(JSON.stringify(finals[idx]));
-    saveToday();
-    location.reload();
-  }
-
-  function deleteFinal(fecha){
-    if(!confirm("¿Borrar ese día finalizado?")) return;
-    finals = finals.filter(x => x.fecha !== fecha);
-    saveFinals();
-    renderFinals();
-  }
-
-  function printFinal(idx){
-    if(!finals[idx]) return;
-    buildPrint(finals[idx]);
-    window.print();
-  }
-
-  function printPDF(){
-    today.inspector = document.getElementById("inInspector").value || "";
-    today.verif = document.getElementById("inVerif").value || "";
-    saveToday();
-    buildPrint(today);
-    window.print();
-  }
-
-  function buildPrint(obj){
-    const area = document.getElementById("print-area");
-    const rows = (obj.rows || []).map(r => `
+    tb.innerHTML = rows.map(r=>`
       <tr>
-        <td><b>${r.g}</b></td>
-        <td style="text-align:center;"><b>${r.p1}</b></td>
-        <td style="text-align:center;"><b>${r.p2}</b></td>
-        <td style="text-align:center;"><b>${r.fa}</b></td>
-        <td style="text-align:center;"><b>${r.p3}</b></td>
-        <td>${esc(r.obs || "")}</td>
+        <td><b>${esc(r.garron)}</b></td>
+        <td>${pill(r.p1)}</td>
+        <td>${pill(r.p2)}</td>
+        <td>${pill(r.fa)}</td>
+        <td>${pill(r.p3)}</td>
+        <td class="no-print">
+          <button class="mini-btn gray" onclick="editarFila('${r.id}')">Editar</button>
+          <button class="mini-btn danger" onclick="borrarFila('${r.id}')">Borrar</button>
+        </td>
       </tr>
     `).join("");
 
-    area.innerHTML = `
-      <div class="encabezado">
-        <table>
-          <tr>
-            <td class="logo"><img src="logo.jpg" alt="Logo"/></td>
-            <td class="titulo">
-              <strong>CHECK LIST</strong><br>
-              BIENESTAR ANIMAL EN FAENA KOSHER<br>
-              <span style="font-weight:1000;">ISRAEL</span>
-            </td>
-            <td class="info">
-              <div><b>Circular:</b> 4170 A</div>
-              <div><b>Código:</b> R-BA-001-6</div>
-              <div><b>Emisión:</b> Junio / 2024</div>
-              <div><b>Rev:</b> 03</div>
-            </td>
-          </tr>
+    if(rows.length === 0){
+      tb.innerHTML = `<tr><td colspan="6" style="color:var(--muted);">Sin registros todavía.</td></tr>`;
+    }
+  }
+
+  function borrarFila(id){
+    if(!current) return;
+    if(!confirm("¿Borrar esta fila?")) return;
+    current.rows = current.rows.filter(r => r.id !== id);
+    saveCurrent();
+    renderTable();
+  }
+
+  function editarFila(id){
+    if(!current) return;
+    const r = current.rows.find(x=>x.id===id);
+    if(!r) return;
+
+    document.getElementById("in-garron").value = r.garron;
+    document.getElementById("in-p1").value = r.p1 || "";
+    document.getElementById("in-p2").value = r.p2 || "";
+    document.getElementById("in-fa").value = r.fa || "";
+    document.getElementById("in-p3").value = r.p3 || "";
+
+    document.getElementById("in-nc").value = r.nc || "";
+    document.getElementById("in-ac").value = r.ac || "";
+    document.getElementById("in-ap").value = r.ap || "";
+    document.getElementById("in-enc").value = r.enc || "";
+
+    syncNcPanel();
+
+    if(confirm("Editar esta fila: OK = se reemplaza cuando vuelvas a tocar AGREGAR.")){
+      current.rows = current.rows.filter(x=>x.id!==id);
+      saveCurrent();
+      renderTable();
+    }
+  }
+
+  function nuevoDia(){
+    current = {
+      id: uid(),
+      fecha: "",
+      animales: "Todos los animales que integran la faena Kosher del día",
+      resp: "",
+      obs: "",
+      rows: [],
+      finalized: false
+    };
+    saveCurrent();
+    fillHeaderFields();
+    renderTable();
+    limpiarCarga();
+
+    // enganchar change listeners (una vez)
+    ["in-p1","in-p2","in-fa","in-p3"].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el && !el.dataset.bound){
+        el.addEventListener("change", syncNcPanel);
+        el.dataset.bound = "1";
+      }
+    });
+  }
+
+  function borrarDiaActual(){
+    if(!current) return;
+    if(!confirm("¿Borrar el día actual (lo que estás cargando)?")) return;
+    localStorage.removeItem(LS_CURR);
+    current = null;
+    nuevoDia();
+  }
+
+  function finalizarDia(){
+    if(!current) return;
+    readHeaderFields();
+
+    if(!current.fecha){
+      alert("Falta la fecha de faena.");
+      return;
+    }
+    if(current.rows.length === 0){
+      alert("No hay registros cargados.");
+      return;
+    }
+
+    const days = loadDays();
+    current.finalized = true;
+
+    const idx = days.findIndex(d => d.id === current.id);
+    if(idx >= 0) days[idx] = current;
+    else days.unshift(current);
+
+    saveDays(days);
+    alert("Día finalizado y guardado ✅");
+  }
+
+  function renderDays(){
+    const days = loadDays();
+    const body = document.getElementById("daysBody");
+
+    body.innerHTML = days.map(d => `
+      <tr>
+        <td><b>${esc(d.fecha)}</b></td>
+        <td>${(d.rows||[]).length}</td>
+        <td>${esc(d.resp || "")}</td>
+        <td>${esc(d.obs || "")}</td>
+        <td class="no-print">
+          <button class="mini-btn primary" onclick="reabrirDia('${d.id}')">Editar</button>
+          <button class="mini-btn gray" onclick="imprimirDia('${d.id}')">PDF</button>
+          <button class="mini-btn danger" onclick="borrarDia('${d.id}')">Borrar</button>
+        </td>
+      </tr>
+    `).join("");
+
+    if(days.length === 0){
+      body.innerHTML = `<tr><td colspan="5" style="color:var(--muted);">Todavía no hay días finalizados.</td></tr>`;
+    }
+  }
+
+  function reabrirDia(id){
+    const days = loadDays();
+    const d = days.find(x => x.id === id);
+    if(!d) return;
+    current = d;
+    current.finalized = false;
+    saveCurrent();
+    fillHeaderFields();
+    renderTable();
+    limpiarCarga();
+
+    document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
+    document.getElementById("tab-reg").classList.add("active");
+    document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
+    document.querySelectorAll(".tab-btn")[0].classList.add("active");
+  }
+
+  function borrarDia(id){
+    if(!confirm("¿Borrar este día guardado?")) return;
+    let days = loadDays();
+    days = days.filter(d => d.id !== id);
+    saveDays(days);
+    renderDays();
+  }
+
+  function imprimirDiaActual(){
+    if(!current) return;
+    readHeaderFields();
+    if(!current.fecha){ alert("Falta fecha de faena."); return; }
+    if(current.rows.length === 0){ alert("No hay registros cargados."); return; }
+    printObject(current);
+  }
+
+  function imprimirDia(id){
+    const days = loadDays();
+    const d = days.find(x => x.id === id);
+    if(!d) return;
+    printObject(d);
+  }
+
+  function printObject(d){
+    const rows = (d.rows || []).slice().sort((a,b)=> Number(a.garron) - Number(b.garron));
+    const ncRows = rows.filter(r => anyNC(r.p1,r.p2,r.fa,r.p3));
+    const pillText = (v)=> (v || "—");
+
+    const html = `
+      <div class="print-page">
+        <div class="encabezado">
+          <table>
+            <tr>
+              <td class="logo">
+                <img src="logo.jpg" onerror="this.onerror=null; this.src='logo.png';" alt="Logo">
+              </td>
+              <td class="titulo">
+                <div><strong>CHECK LIST</strong></div>
+                <div><strong>BIENESTAR ANIMAL EN FAENA KOSHER</strong></div>
+                <div><strong>ISRAEL</strong></div>
+                <div style="margin-top:4px; color:#0b3d91; font-weight:900;">Circular 4170 A | R-BA-001-6</div>
+              </td>
+              <td class="info">Emisión: Junio / 2024<br>Rev: 03</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="margin-top:10px; font-size:13px;">
+          <div><b>Fecha de faena:</b> ${esc(d.fecha)}</div>
+          <div><b>Animales a revisar:</b> ${esc(d.animales || "")}</div>
+          <div><b>Responsable:</b> ${esc(d.resp || "")}</div>
+          ${d.obs ? `<div><b>Obs:</b> ${esc(d.obs)}</div>` : ``}
+          <div style="margin-top:8px; font-weight:900;">REGISTRO</div>
+        </div>
+
+        <table style="width:100%; border-collapse:collapse; margin-top:8px;">
+          <thead>
+            <tr>
+              <th style="border:1px solid #000; padding:6px;">Garrón</th>
+              <th style="border:1px solid #000; padding:6px;">P1</th>
+              <th style="border:1px solid #000; padding:6px;">P2</th>
+              <th style="border:1px solid #000; padding:6px;">FA</th>
+              <th style="border:1px solid #000; padding:6px;">P3</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r=>`
+              <tr>
+                <td style="border:1px solid #000; padding:6px;">${esc(r.garron)}</td>
+                <td style="border:1px solid #000; padding:6px;">${pillText(r.p1)}</td>
+                <td style="border:1px solid #000; padding:6px;">${pillText(r.p2)}</td>
+                <td style="border:1px solid #000; padding:6px;">${pillText(r.fa)}</td>
+                <td style="border:1px solid #000; padding:6px;">${pillText(r.p3)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
         </table>
-      </div>
 
-      <div style="margin:10px 0; font-size:12pt;">
-        <b>Fecha de faena:</b> ${esc(obj.fecha || "")}
-      </div>
+        ${ncRows.length ? `
+          <div style="margin-top:14px; font-weight:900;">NO CONFORMIDADES / ACCIONES</div>
+          <table style="width:100%; border-collapse:collapse; margin-top:8px;">
+            <thead>
+              <tr>
+                <th style="border:1px solid #000; padding:6px;">Garrón</th>
+                <th style="border:1px solid #000; padding:6px;">Detalle NC</th>
+                <th style="border:1px solid #000; padding:6px;">Acción correctiva</th>
+                <th style="border:1px solid #000; padding:6px;">Acción preventiva</th>
+                <th style="border:1px solid #000; padding:6px;">Encargado</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${ncRows.map(r=>`
+                <tr>
+                  <td style="border:1px solid #000; padding:6px;">${esc(r.garron)}</td>
+                  <td style="border:1px solid #000; padding:6px;">${esc(r.nc || "")}</td>
+                  <td style="border:1px solid #000; padding:6px;">${esc(r.ac || "")}</td>
+                  <td style="border:1px solid #000; padding:6px;">${esc(r.ap || "")}</td>
+                  <td style="border:1px solid #000; padding:6px;">${esc(r.enc || "")}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        ` : ``}
 
-      <table class="print-table" style="width:100%; border-collapse:collapse;">
-        <thead>
-          <tr>
-            <th style="width:90px;">Garrón</th>
-            <th style="width:70px;">P1</th>
-            <th style="width:70px;">P2</th>
-            <th style="width:70px;">FA</th>
-            <th style="width:70px;">P3</th>
-            <th>Obs</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-
-      <div style="margin-top:14px; display:flex; justify-content:space-between; gap:20px;">
-        <div style="width:48%; border-top:2px solid #111; padding-top:6px;">
-          <b>Inspector:</b> ${esc(obj.inspector || "")}
+        <div class="sign">
+          <div class="line">Analista</div>
+          <div class="line">Verificador</div>
         </div>
-        <div style="width:48%; border-top:2px solid #111; padding-top:6px;">
-          <b>Verificación:</b> ${esc(obj.verif || "")}
-        </div>
-      </div>
-
-      <div style="margin-top:12px; font-size:11pt;">
-        <b>Referencias:</b> A = Aceptable · NC = No conforme
       </div>
     `;
+
+    const w = window.open("", "_blank");
+    w.document.write(`
+      <html>
+      <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>PDF Bienestar Animal</title>
+        <style>
+          body{ font-family: Arial, sans-serif; margin:0; padding:0; }
+          .encabezado table{ width:100%; border-collapse: collapse; }
+          .encabezado td{ border:2px solid #000; padding:8px; vertical-align:middle; }
+          .encabezado .logo{ width:20%; text-align:center; }
+          .encabezado .logo img{ width:110px; max-width:100%; height:auto; }
+          .encabezado .titulo{ width:60%; text-align:center; font-size:13px; line-height:1.25; }
+          .encabezado .info{ width:20%; text-align:center; font-size:12px; background:#dff3ff; line-height:1.25; }
+          .print-page{ padding: 8mm; }
+          .sign{ margin-top:16px; display:flex; justify-content:space-between; gap:18px; }
+          .line{ flex:1; border-top: 2px solid #000; padding-top:6px; text-align:center; font-weight:800; }
+          @page { margin: 10mm; }
+        </style>
+      </head>
+      <body>
+        ${html}
+        <script>window.onload = () => { window.print(); }<\/script>
+      </body>
+      </html>
+    `);
+    w.document.close();
   }
 
-  // BACKUP
-  function downloadBackup(){
-    const payload = { version:"ba_kosher_backup_v3", exportedAt:new Date().toISOString(), today, finals };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
-    const a = document.createElement("a");
-    const fecha = (today.fecha || new Date().toISOString().slice(0,10)).replaceAll("-","");
-    a.href = URL.createObjectURL(blob);
-    a.download = `R-BA-001-6_${fecha}.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  function triggerImport(){ document.getElementById("importFile").click(); }
-
-  document.getElementById("importFile").addEventListener("change", async (e)=>{
-    const f = e.target.files?.[0];
-    if(!f) return;
-    try{
-      const txt = await f.text();
-      const payload = JSON.parse(txt);
-      if(payload.version !== "ba_kosher_backup_v3") throw new Error("Formato no válido.");
-      today = payload.today || loadToday();
-      finals = payload.finals || loadFinals();
-      saveToday(); saveFinals();
-      alert("✅ Importado OK.");
-      location.reload();
-    }catch(err){
-      alert("❌ No pude importar: " + err.message);
-    }finally{
-      e.target.value = "";
+  window.onload = () => {
+    current = loadCurrent();
+    if(!current){
+      nuevoDia();
+    } else {
+      fillHeaderFields();
+      renderTable();
+      limpiarCarga();
     }
-  });
 
-  function clearToday(){
-    if(!confirm("¿Borrar el día actual? (No borra finalizados)")) return;
-    localStorage.removeItem(KEY_TODAY);
-    today = loadToday();
-    location.reload();
-  }
+    ["in-p1","in-p2","in-fa","in-p3"].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el && !el.dataset.bound){
+        el.addEventListener("change", syncNcPanel);
+        el.dataset.bound = "1";
+      }
+    });
 
-  // STORAGE
-  function loadToday(){
-    try{
-      return JSON.parse(localStorage.getItem(KEY_TODAY)) || { fecha:"", start:"", inspector:"", verif:"", rows:[] };
-    }catch{
-      return { fecha:"", start:"", inspector:"", verif:"", rows:[] };
-    }
-  }
-  function saveToday(){ localStorage.setItem(KEY_TODAY, JSON.stringify(today)); }
-
-  function loadFinals(){
-    try{ return JSON.parse(localStorage.getItem(KEY_FINAL)) || []; }catch{ return []; }
-  }
-  function saveFinals(){ localStorage.setItem(KEY_FINAL, JSON.stringify(finals)); }
-
-  // ESCAPE
-  function esc(s){ return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
-  function escAttr(s){ return String(s ?? "").replaceAll("'","&#39;").replaceAll('"',"&quot;"); }
+    syncNcPanel();
+  };
 </script>
 
 </body>
