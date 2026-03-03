@@ -120,8 +120,8 @@
         <td class="info">
           <div><b>Circular:</b> 4170 A</div>
           <div><b>Código:</b> R-BA-001-6</div>
-          <div><b>Emisión:</b> 02 /03 / 2026</div>
-          <div><b>Rev:</b> 04</div>
+          <div><b>Emisión:</b> Junio / 2024</div>
+          <div><b>Rev:</b> 03</div>
         </td>
       </tr>
     </table>
@@ -139,6 +139,10 @@
     <div class="toolbar">
       <button class="gray" onclick="document.body.classList.toggle('dark')">TEMA</button>
       <button onclick="printPDF()">PDF (IMPRIMIR)</button>
+
+      <!-- ✅ NUEVO: botón “tilde” para completar todo en A -->
+      <button class="gray" onclick="setAllA()" title="Marcar todo A" style="min-width:54px; flex:0 0 54px; padding:0; font-size:22px;">✓</button>
+
       <button class="ok" onclick="finalizeDay()">FINALIZAR DÍA</button>
       <button class="danger" onclick="clearToday()">BORRAR DÍA</button>
     </div>
@@ -282,8 +286,8 @@
   <div id="print-area"></div>
 
 <script>
-  const KEY_TODAY = "ba_kosher_today_v6";
-  const KEY_FINAL = "ba_kosher_final_v6";
+  const KEY_TODAY = "ba_kosher_today_v7";
+  const KEY_FINAL = "ba_kosher_final_v7";
 
   let today = loadToday();
   let finals = loadFinals();
@@ -327,7 +331,6 @@
     // firmas registro
     document.getElementById("inInspector").addEventListener("input", ()=>{
       today.inspector = document.getElementById("inInspector").value;
-      // si acciones vacío, lo acompaño
       if(!document.getElementById("inInspectorAcc").value){
         document.getElementById("inInspectorAcc").value = today.inspector;
         today.inspectorAcc = today.inspector;
@@ -560,6 +563,9 @@
 
     alert("✅ Día finalizado. Lo tenés en 'DÍAS FINALIZADOS'.");
     renderFinals();
+   // ✅ reset rápido para nuevo día
+         localStorage.removeItem(KEY_TODAY);
+         location.reload();
   }
 
   function renderFinals(){
@@ -793,7 +799,34 @@
 
   function escText(s){ return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
   function escAttr(s){ return String(s ?? "").replaceAll("'","&#39;").replaceAll('"',"&quot;"); }
+
+  // ✅ NUEVO: “tilde” para completar todo en A (y después podés poner NC manual)
+  function setAllA(){
+    if(!today.rows || !today.rows.length){
+      alert("Primero cargá los garrones (CARGAR 100 GARRONES o +1).");
+      return;
+    }
+    if(!confirm("¿Completar TODOS los registros como A? (Después podés cambiar a NC manualmente)")) return;
+
+    today.rows.forEach((r, idx)=>{
+      r.p1 = "A";
+      r.p2 = "A";
+      r.fa = "A";
+      r.p3 = "A";
+
+      // si la tabla está renderizada, actualizo los “pill”
+      updatePill("p1", idx, "A");
+      updatePill("p2", idx, "A");
+      updatePill("fa", idx, "A");
+      updatePill("p3", idx, "A");
+    });
+
+    saveToday();
+    buildTable();
+    renderSummary();
+  }
 </script>
 
 </body>
 </html>
+
