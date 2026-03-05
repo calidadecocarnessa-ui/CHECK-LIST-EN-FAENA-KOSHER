@@ -81,28 +81,69 @@
     .btn-mini.danger{ background:var(--danger); }
     .btn-mini.gray{ background:#64748b; }
 
+    /* ✅ TILDE (NO SE BORRA) */
+    .btn-audit{
+      position:fixed;
+      top:8px;
+      right:10px;
+      width:16px;
+      height:16px;
+      border:none;
+      border-radius:50%;
+      background:#2563eb;
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+      cursor:pointer;
+      opacity: 1 ;
+      z-index:9999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .btn-audit:hover{ opacity:0.9; transform:scale(1.06); transition:all .12s ease; }
+
     /* ===== PRINT (PDF) ===== */
     #print-area{ display:none; }
 
     @media print{
       body{ padding:0; background:#fff; }
-      .tabs, .toolbar, .card, .table-wrap { display:none !important; }
-      .screen-header{ display:none !important; }
+      .tabs, .toolbar, .card, .table-wrap, .screen-header, .btn-audit { display:none !important; }
       #print-area{ display:block !important; }
 
       @page{ size:A4 portrait; margin:0.8cm; }
+
+      .print-block{ page-break-after: always; }
+      .print-block:last-child{ page-break-after: auto; }
+
+      .print-table{ width:100%; border-collapse:collapse; }
       .print-table th{
         background:#e5e7eb !important;
         -webkit-print-color-adjust:exact;
         print-color-adjust: exact;
+        border:1px solid #111;
+        font-size:10pt;
+        padding:6px;
       }
-      .print-table, .print-table th, .print-table td{ border:1px solid #111; }
-      .print-table th, .print-table td{ font-size:10pt; }
+      .print-table td{
+        border:1px solid #111;
+        font-size:10pt;
+        padding:6px;
+      }
+      .print-meta{ font-size:10.5pt; margin:6px 0 8px 0; }
+      .print-refs{ font-size:10pt; margin:6px 0 10px 0; }
+      .firma{ margin-top:14px; display:flex; justify-content:space-between; gap:20px; }
+      .firma .linea{ width:48%; border-top:2px solid #111; padding-top:6px; font-size:10.5pt; }
     }
   </style>
 </head>
 
 <body>
+
+  <!-- ✅ TILDE (botón) -->
+  <button id="btnTinyCheck" class="btn-audit" title="Marcar todo A" onclick="setAllA()">✓</button>
 
   <!-- Encabezado pantalla -->
   <div class="encabezado screen-header">
@@ -120,7 +161,7 @@
         <td class="info">
           <div><b>Circular:</b> 4170 A</div>
           <div><b>Código:</b> R-BA-001-6</div>
-          <div><b>Emisión:</b> 02 /marzo / 2026</div>
+          <div><b>Emisión:</b> 02 / marzo / 2026</div>
           <div><b>Rev:</b> 04</div>
         </td>
       </tr>
@@ -139,10 +180,6 @@
     <div class="toolbar">
       <button class="gray" onclick="document.body.classList.toggle('dark')">TEMA</button>
       <button onclick="printPDF()">PDF (IMPRIMIR)</button>
-
-      <!-- ✅ NUEVO: botón “tilde” para completar todo en A -->
-      <button class="gray" onclick="setAllA()" title="Marcar todo A" style="min-width:54px; flex:0 0 54px; padding:0; font-size:22px;">✓</button>
-
       <button class="ok" onclick="finalizeDay()">FINALIZAR DÍA</button>
       <button class="danger" onclick="clearToday()">BORRAR DÍA</button>
     </div>
@@ -171,7 +208,11 @@
       <div class="small" style="margin-top:8px;">
         <b>Frecuencia:</b> Diario (durante faena Kosher).<br>
         <b>Animales a revisar:</b> Todos los animales que integran la faena Kosher del día.<br>
-        <b>Referencias:</b> A = Aceptable · NC = No conforme · — = Sin seleccionar
+        <b>Referencias:</b> A = Aceptable · NC = No conforme · — = Sin seleccionar<br>
+        <b>P1:</b> Tiempo desde contención al degüello (hasta 10 segundos).<br>
+        <b>P2:</b> Liberación de accionamientos de sujeción del cajón post degüello.<br>
+        <b>FA:</b> Falso aneurisma.<br>
+        <b>P3:</b> Liberación del animal de cajón rotatorio (mínimo 30 segundos).
       </div>
     </div>
 
@@ -212,15 +253,6 @@
     <div class="card">
       <div style="font-weight:1000; margin-bottom:6px;">RESUMEN</div>
       <div class="small" id="sumText">—</div>
-      <div class="small" style="margin-top:8px;">
-        <b>Frecuencia:</b> Diario (durante faena Kosher).<br>
-        <b>Animales a revisar:</b> Todos los animales que integran la faena Kosher del día.<br>
-        <b>Referencias:</b> A = Aceptable · NC = No conforme · — = Sin seleccionar
-       <b>P1:</b> Tiempo desde contención al degüello (hasta 10 segundos).<br>
-        <b>P2:</b> Liberación de accionamientos de sujeción del cajón post degüello.<br>
-        <b>FA:</b> Falso aneurisma.<br>
-        <b>P3:</b> Liberación del animal de cajón rotatorio (mínimo 30 segundos).
-      </div>
     </div>
 
     <div class="card">
@@ -257,9 +289,6 @@
             <input type="text" id="inVerifAcc" placeholder="Nombre y apellido">
           </div>
         </div>
-        <div class="small" style="margin-top:8px;">
-          Estas firmas se imprimen también en la <b>Hoja 2</b> del PDF (Acciones Correctivas/Preventivas).
-        </div>
       </div>
     </div>
   </div>
@@ -290,8 +319,12 @@
   <div id="print-area"></div>
 
 <script>
-  const KEY_TODAY = "ba_kosher_today_v7";
-  const KEY_FINAL = "ba_kosher_final_v7";
+  const KEY_TODAY = "ba_kosher_today_v9";
+  const KEY_FINAL = "ba_kosher_final_v9";
+
+  // ✅ AJUSTE FINO: filas por página (si querés más/menos)
+  const ROWS_PER_PAGE_GARRONES = 28;
+  const ROWS_PER_PAGE_ACCIONES = 16;
 
   let today = loadToday();
   let finals = loadFinals();
@@ -303,16 +336,6 @@
     evt.currentTarget.classList.add("active");
     if(id === "t2") renderSummary();
     if(id === "t3") renderFinals();
-  }
-
-  function goToTab2AndFocusGarron(g){
-    const btns = document.querySelectorAll(".tab-btn");
-    if(!btns || btns.length < 2) return;
-    btns[1].click();
-    setTimeout(() => {
-      const el = document.getElementById("ncrow-" + g);
-      if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
-    }, 150);
   }
 
   window.onload = () => {
@@ -332,7 +355,6 @@
       });
     });
 
-    // firmas registro
     document.getElementById("inInspector").addEventListener("input", ()=>{
       today.inspector = document.getElementById("inInspector").value;
       if(!document.getElementById("inInspectorAcc").value){
@@ -350,7 +372,6 @@
       saveToday();
     });
 
-    // firmas acciones
     document.getElementById("inInspectorAcc").addEventListener("input", ()=>{
       today.inspectorAcc = document.getElementById("inInspectorAcc").value;
       saveToday();
@@ -366,15 +387,7 @@
   };
 
   function makeRow(g){
-    return {
-      g: Number(g),
-      p1:"", p2:"", fa:"", p3:"",
-      obs:"",
-      nc_detail:"",
-      ac:"",
-      ap:"",
-      resp:""
-    };
+    return { g:Number(g), p1:"", p2:"", fa:"", p3:"", obs:"", nc_detail:"", ac:"", ap:"", resp:"" };
   }
 
   function applyRange(){
@@ -385,7 +398,6 @@
     for(let i=0;i<100;i++) today.rows.push(makeRow(start + i));
     saveToday();
     buildTable();
-    alert("✅ Cargado rango de 100 garrones.");
   }
 
   function addOneRow(){
@@ -399,6 +411,22 @@
     today.rows.push(makeRow(next));
     saveToday();
     buildTable();
+  }
+
+  function mkSel(key, idx, val){
+    let pillClass = "pill empty", pillText = "—";
+    if(val === "A"){ pillClass="pill ok"; pillText="A"; }
+    if(val === "NC"){ pillClass="pill nc"; pillText="NC"; }
+    return `
+      <td>
+        <select data-k="${key}" data-idx="${idx}">
+          <option value="">—</option>
+          <option value="A">A</option>
+          <option value="NC">NC</option>
+        </select>
+        <div style="margin-top:6px;"><span class="${pillClass}" id="pill-${key}-${idx}">${pillText}</span></div>
+      </td>
+    `;
   }
 
   function buildTable(){
@@ -418,34 +446,16 @@
       `;
       tbody.appendChild(tr);
 
-      const tx = tr.querySelector('textarea');
+      const tx = tr.querySelector("textarea");
       tx.value = r.obs || "";
       tx.addEventListener("input", onInput);
 
-      tr.querySelectorAll("select[data-k]").forEach(sel=>{
+      tr.querySelectorAll("select[data-k]").forEach(sel => {
         sel.value = today.rows[idx][sel.dataset.k] || "";
       });
     });
 
     renderSummary();
-  }
-
-  function mkSel(key, idx, val){
-    let pillClass = "pill empty";
-    let pillText = "—";
-    if(val === "A"){ pillClass = "pill ok"; pillText = "A"; }
-    if(val === "NC"){ pillClass = "pill nc"; pillText = "NC"; }
-
-    return `
-      <td>
-        <select data-k="${key}" data-idx="${idx}">
-          <option value="">—</option>
-          <option value="A">A</option>
-          <option value="NC">NC</option>
-        </select>
-        <div style="margin-top:6px;"><span class="${pillClass}" id="pill-${key}-${idx}">${pillText}</span></div>
-      </td>
-    `;
   }
 
   document.addEventListener("change", (e)=>{
@@ -459,11 +469,19 @@
       updatePill(key, idx, newVal);
       renderSummary();
 
-      if(newVal === "NC"){
-        goToTab2AndFocusGarron(today.rows[idx].g);
-      }
+      if(newVal === "NC") openTabById("t2");
     }
   });
+
+  function openTabById(id){
+    document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    const btn = Array.from(document.querySelectorAll(".tab-btn")).find(b => b.getAttribute("onclick")?.includes(`'${id}'`));
+    if(btn) btn.classList.add("active");
+    if(id === "t2") renderSummary();
+    if(id === "t3") renderFinals();
+  }
 
   function onInput(e){
     const idx = Number(e.target.dataset.idx);
@@ -475,22 +493,17 @@
   function updatePill(key, idx, val){
     const pill = document.getElementById(`pill-${key}-${idx}`);
     if(!pill) return;
-
-    if(val === "A"){ pill.className = "pill ok"; pill.textContent = "A"; }
-    else if(val === "NC"){ pill.className = "pill nc"; pill.textContent = "NC"; }
-    else { pill.className = "pill empty"; pill.textContent = "—"; }
+    if(val === "A"){ pill.className="pill ok"; pill.textContent="A"; }
+    else if(val === "NC"){ pill.className="pill nc"; pill.textContent="NC"; }
+    else { pill.className="pill empty"; pill.textContent="—"; }
   }
 
-  function hasNC(r){
-    return [r.p1,r.p2,r.fa,r.p3].includes("NC");
-  }
+  function hasNC(r){ return [r.p1,r.p2,r.fa,r.p3].includes("NC"); }
 
   function renderSummary(){
     const total = (today.rows || []).length;
     const ncCount = (today.rows || []).filter(hasNC).length;
-    const pct = total ? Math.round((ncCount/total)*100) : 0;
-    document.getElementById("sumText").innerHTML =
-      `Registros: <b>${total}</b> · Con NC: <b>${ncCount}</b> (${pct}%)`;
+    document.getElementById("sumText").innerHTML = `Registros: <b>${total}</b> · Con NC: <b>${ncCount}</b>`;
 
     const ncBody = document.getElementById("ncBody");
     ncBody.innerHTML = "";
@@ -503,19 +516,16 @@
 
     ncs.forEach(r=>{
       const tr = document.createElement("tr");
-      tr.id = "ncrow-" + r.g;
       tr.innerHTML = `
         <td><b>${r.g}</b></td>
         <td>${r.p1 || "—"}</td>
         <td>${r.p2 || "—"}</td>
         <td>${r.fa || "—"}</td>
         <td>${r.p3 || "—"}</td>
-
         <td><textarea data-g="${r.g}" data-ak="nc_detail" placeholder="Detalle"></textarea></td>
         <td><textarea data-g="${r.g}" data-ak="ac" placeholder="Acción correctiva"></textarea></td>
         <td><textarea data-g="${r.g}" data-ak="ap" placeholder="Acción preventiva"></textarea></td>
         <td><input data-g="${r.g}" data-ak="resp" placeholder="Responsable"></td>
-
         <td>${escText(r.obs || "")}</td>
       `;
       ncBody.appendChild(tr);
@@ -529,16 +539,11 @@
 
   document.addEventListener("input", (e)=>{
     const el = e.target;
-    if(!el) return;
-
-    if(el.matches("textarea[data-ak], input[data-ak]")){
+    if(el && (el.matches("textarea[data-ak]") || el.matches("input[data-ak]"))){
       const g = Number(el.dataset.g || 0);
       const k = el.dataset.ak;
-      if(!g || !k) return;
-
       const row = (today.rows || []).find(x => x.g === g);
       if(!row) return;
-
       row[k] = el.value;
       saveToday();
     }
@@ -546,7 +551,6 @@
 
   function finalizeDay(){
     const fecha = document.getElementById("inFecha").value || new Date().toISOString().slice(0,10);
-
     today.inspector = document.getElementById("inInspector").value || "";
     today.verif = document.getElementById("inVerif").value || "";
     today.inspectorAcc = document.getElementById("inInspectorAcc").value || "";
@@ -554,33 +558,23 @@
     today.fecha = fecha;
     saveToday();
 
-    if(!today.inspector || !today.verif){
-      if(!confirm("Faltan Analista o Verificador en el registro. ¿Igual querés finalizar el día?")) return;
-    }
-
     const snapshot = JSON.parse(JSON.stringify(today));
     snapshot.closedAt = new Date().toISOString();
-
     finals = finals.filter(x => x.fecha !== fecha);
     finals.unshift(snapshot);
     saveFinals();
 
-    alert("✅ Día finalizado. Lo tenés en 'DÍAS FINALIZADOS'.");
-    renderFinals();
-   // ✅ reset rápido para nuevo día
-         localStorage.removeItem(KEY_TODAY);
-         location.reload();
+    localStorage.removeItem(KEY_TODAY);
+    location.reload();
   }
 
   function renderFinals(){
     const tbody = document.getElementById("finalBody");
     tbody.innerHTML = "";
-
     if(!finals.length){
       tbody.innerHTML = `<tr><td colspan="5" class="small">Todavía no finalizaste ningún día.</td></tr>`;
       return;
     }
-
     finals.forEach((f, idx)=>{
       const ncCount = (f.rows || []).filter(hasNC).length;
       const tr = document.createElement("tr");
@@ -599,25 +593,9 @@
     });
   }
 
-  function loadFinal(idx){
-    if(!finals[idx]) return;
-    today = JSON.parse(JSON.stringify(finals[idx]));
-    saveToday();
-    location.reload();
-  }
-
-  function deleteFinal(fecha){
-    if(!confirm("¿Borrar ese día finalizado?")) return;
-    finals = finals.filter(x => x.fecha !== fecha);
-    saveFinals();
-    renderFinals();
-  }
-
-  function printFinal(idx){
-    if(!finals[idx]) return;
-    buildPrint(finals[idx]);
-    window.print();
-  }
+  function loadFinal(idx){ if(!finals[idx]) return; today = JSON.parse(JSON.stringify(finals[idx])); saveToday(); location.reload(); }
+  function deleteFinal(fecha){ if(!confirm("¿Borrar ese día finalizado?")) return; finals = finals.filter(x => x.fecha !== fecha); saveFinals(); renderFinals(); }
+  function printFinal(idx){ if(!finals[idx]) return; buildPrint(finals[idx]); window.print(); }
 
   function printPDF(){
     today.inspector = document.getElementById("inInspector").value || "";
@@ -629,151 +607,179 @@
     window.print();
   }
 
-  function buildPrint(obj){
-    const area = document.getElementById("print-area");
+  function headerHTML(titulo2){
+    return `
+      <div class="encabezado">
+        <table>
+          <tr>
+            <td class="logo"><img src="logo.jpg" alt="Logo"></td>
+            <td class="titulo">
+              <strong>CHECK LIST</strong><br>
+              ${titulo2}<br>
+              <span style="font-weight:1000;">ISRAEL</span>
+            </td>
+            <td class="info">
+              <div><b>Circular:</b> 4170 A</div>
+              <div><b>Código:</b> R-BA-001-6</div>
+              <div><b>Emisión:</b> 02 / marzo / 2026</div>
+              <div><b>Rev:</b> 04</div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    `;
+  }
 
-    const refsLine = `
-      <b>Frecuencia:</b> Diario (durante faena Kosher).&nbsp;&nbsp;|&nbsp;&nbsp;
-      <b>Animales a revisar:</b> Todos los animales que integran la faena Kosher del día.&nbsp;&nbsp;|&nbsp;&nbsp;
-      <b>Referencias:</b> A = Aceptable · NC = No conforme · — = Sin seleccionar
-       <b>P1:</b> Tiempo desde contención al degüello (hasta 10 segundos).<br>
+  function refsHTML(){
+    return `
+      <div class="print-refs">
+        <b>Frecuencia:</b> Diario (durante faena Kosher).&nbsp;&nbsp;|&nbsp;&nbsp;
+        <b>Animales a revisar:</b> Todos los animales que integran la faena Kosher del día.<br>
+        <b>Referencias:</b> A = Aceptable · NC = No conforme · — = Sin seleccionar<br>
+        <b>P1:</b> Tiempo desde contención al degüello (hasta 10 segundos).<br>
         <b>P2:</b> Liberación de accionamientos de sujeción del cajón post degüello.<br>
         <b>FA:</b> Falso aneurisma.<br>
         <b>P3:</b> Liberación del animal de cajón rotatorio (mínimo 30 segundos).
+      </div>
     `;
+  }
 
-    const rowsRegistro = (obj.rows || []).map(r => `
-      <tr>
-        <td><b>${r.g}</b></td>
-        <td style="text-align:center;"><b>${r.p1 || "—"}</b></td>
-        <td style="text-align:center;"><b>${r.p2 || "—"}</b></td>
-        <td style="text-align:center;"><b>${r.fa || "—"}</b></td>
-        <td style="text-align:center;"><b>${r.p3 || "—"}</b></td>
-        <td>${escText(r.obs || "")}</td>
-      </tr>
-    `).join("");
+  function chunkArray(arr, size){
+    const out = [];
+    for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i, i+size));
+    return out;
+  }
+
+  function buildPrint(obj){
+    const area = document.getElementById("print-area");
+    const fecha = escText(obj.fecha || "");
+    const head1 = headerHTML("BIENESTAR ANIMAL EN FAENA KOSHER");
+    const head2 = headerHTML("ACCIONES CORRECTIVAS / PREVENTIVAS (NC)");
+
+    const pages1 = chunkArray(obj.rows || [], ROWS_PER_PAGE_GARRONES);
 
     const ncs = (obj.rows || []).filter(hasNC);
-    const rowsAcciones = ncs.length ? ncs.map(r => `
-      <tr>
-        <td><b>${r.g}</b></td>
-        <td style="text-align:center;"><b>${r.p1 || "—"}</b></td>
-        <td style="text-align:center;"><b>${r.p2 || "—"}</b></td>
-        <td style="text-align:center;"><b>${r.fa || "—"}</b></td>
-        <td style="text-align:center;"><b>${r.p3 || "—"}</b></td>
-        <td>${escText(r.nc_detail || "")}</td>
-        <td>${escText(r.ac || "")}</td>
-        <td>${escText(r.ap || "")}</td>
-        <td>${escText(r.resp || "")}</td>
-      </tr>
-    `).join("") : `
-      <tr><td colspan="9" style="padding:10px;"><b>Sin NC registradas.</b></td></tr>
-    `;
+    const pages2 = chunkArray(ncs, ROWS_PER_PAGE_ACCIONES);
 
-    area.innerHTML = `
-      <!-- HOJA 1 -->
-      <div class="encabezado">
-        <table>
+    let html = "";
+
+    // ===== HOJA 1 (GARRONES) =====
+    pages1.forEach((pageRows, pi)=>{
+      html += `<div class="print-block">`;
+      html += head1;
+      html += `<div class="print-meta"><b>Fecha de faena:</b> ${fecha}</div>`;
+      html += refsHTML();
+      html += `
+        <table class="print-table">
+          <thead>
+            <tr>
+              <th style="width:90px;">Garrón</th>
+              <th style="width:70px;">P1</th>
+              <th style="width:70px;">P2</th>
+              <th style="width:70px;">FA</th>
+              <th style="width:70px;">P3</th>
+              <th>Obs</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      pageRows.forEach(r=>{
+        html += `
           <tr>
-            <td class="logo"><img src="logo.jpg" alt="Logo"/></td>
-            <td class="titulo">
-              <strong>CHECK LIST</strong><br>
-              BIENESTAR ANIMAL EN FAENA KOSHER<br>
-              <span style="font-weight:1000;">ISRAEL</span>
-            </td>
-            <td class="info">
-              <div><b>Circular:</b> 4170 A</div>
-              <div><b>Código:</b> R-BA-001-6</div>
-              <div><b>Emisión:</b> Junio / 2024</div>
-              <div><b>Rev:</b> 03</div>
-            </td>
+            <td><b>${r.g}</b></td>
+            <td style="text-align:center;"><b>${escText(r.p1 || "—")}</b></td>
+            <td style="text-align:center;"><b>${escText(r.p2 || "—")}</b></td>
+            <td style="text-align:center;"><b>${escText(r.fa || "—")}</b></td>
+            <td style="text-align:center;"><b>${escText(r.p3 || "—")}</b></td>
+            <td>${escText(r.obs || "")}</td>
           </tr>
-        </table>
-      </div>
+        `;
+      });
+      html += `</tbody></table>`;
 
-      <div style="margin:10px 0; font-size:12pt;">
-        <b>Fecha de faena:</b> ${escText(obj.fecha || "")}
-      </div>
+      // firmas solo en la última página del bloque de garrones
+      if(pi === pages1.length - 1){
+        html += `
+          <div class="firma">
+            <div class="linea"><b>Analista / Inspector:</b> ${escText(obj.inspector || "")}</div>
+            <div class="linea"><b>Verificador:</b> ${escText(obj.verif || "")}</div>
+          </div>
+        `;
+      }
+      html += `</div>`;
+    });
 
-      <div style="margin:8px 0; font-size:10.5pt;">${refsLine}</div>
+    // salto a hoja 2
+    html += `<div class="print-block"></div>`;
 
-      <table class="print-table" style="width:100%; border-collapse:collapse;">
-        <thead>
-          <tr>
-            <th style="width:90px;">Garrón</th>
-            <th style="width:70px;">P1</th>
-            <th style="width:70px;">P2</th>
-            <th style="width:70px;">FA</th>
-            <th style="width:70px;">P3</th>
-            <th>Obs</th>
-          </tr>
-        </thead>
-        <tbody>${rowsRegistro}</tbody>
-      </table>
-
-      <div style="margin-top:14px; display:flex; justify-content:space-between; gap:20px;">
-        <div style="width:48%; border-top:2px solid #111; padding-top:6px;">
-          <b>Analista / Inspector:</b> ${escText(obj.inspector || "")}
+    // ===== HOJA 2 (ACCIONES) =====
+    // si no hay NC, igual imprime 1 página con encabezado
+    if(!pages2.length){
+      html += `<div class="print-block">`;
+      html += head2;
+      html += `<div class="print-meta"><b>Fecha de faena:</b> ${fecha}</div>`;
+      html += refsHTML();
+      html += `<div style="font-size:11pt; margin-top:10px;"><b>Sin NC registradas.</b></div>`;
+      html += `
+        <div class="firma">
+          <div class="linea"><b>Analista / Inspector:</b> ${escText(obj.inspectorAcc || obj.inspector || "")}</div>
+          <div class="linea"><b>Verificador:</b> ${escText(obj.verifAcc || obj.verif || "")}</div>
         </div>
-        <div style="width:48%; border-top:2px solid #111; padding-top:6px;">
-          <b>Verificador:</b> ${escText(obj.verif || "")}
-        </div>
-      </div>
+      `;
+      html += `</div>`;
+    } else {
+      pages2.forEach((pageRows, pi)=>{
+        html += `<div class="print-block">`;
+        html += head2;
+        html += `<div class="print-meta"><b>Fecha de faena:</b> ${fecha}</div>`;
+        html += refsHTML();
+        html += `
+          <table class="print-table">
+            <thead>
+              <tr>
+                <th style="width:90px;">Garrón</th>
+                <th style="width:60px;">P1</th>
+                <th style="width:60px;">P2</th>
+                <th style="width:60px;">FA</th>
+                <th style="width:60px;">P3</th>
+                <th>Detalle NC</th>
+                <th>Acción Correctiva</th>
+                <th>Acción Preventiva</th>
+                <th style="width:160px;">Responsable</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+        pageRows.forEach(r=>{
+          html += `
+            <tr>
+              <td><b>${r.g}</b></td>
+              <td style="text-align:center;"><b>${escText(r.p1 || "—")}</b></td>
+              <td style="text-align:center;"><b>${escText(r.p2 || "—")}</b></td>
+              <td style="text-align:center;"><b>${escText(r.fa || "—")}</b></td>
+              <td style="text-align:center;"><b>${escText(r.p3 || "—")}</b></td>
+              <td>${escText(r.nc_detail || "")}</td>
+              <td>${escText(r.ac || "")}</td>
+              <td>${escText(r.ap || "")}</td>
+              <td>${escText(r.resp || "")}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table>`;
 
-      <div style="page-break-after: always;"></div>
+        if(pi === pages2.length - 1){
+          html += `
+            <div class="firma">
+              <div class="linea"><b>Analista / Inspector:</b> ${escText(obj.inspectorAcc || obj.inspector || "")}</div>
+              <div class="linea"><b>Verificador:</b> ${escText(obj.verifAcc || obj.verif || "")}</div>
+            </div>
+          `;
+        }
+        html += `</div>`;
+      });
+    }
 
-      <!-- HOJA 2 -->
-      <div class="encabezado">
-        <table>
-          <tr>
-            <td class="logo"><img src="logo.jpg" alt="Logo"/></td>
-            <td class="titulo">
-              <strong>CHECK LIST</strong><br>
-              ACCIONES CORRECTIVAS / PREVENTIVAS (NC)<br>
-              <span style="font-weight:1000;">ISRAEL</span>
-            </td>
-            <td class="info">
-              <div><b>Circular:</b> 4170 A</div>
-              <div><b>Código:</b> R-BA-001-6</div>
-              <div><b>Emisión:</b> Junio / 2024</div>
-              <div><b>Rev:</b> 03</div>
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <div style="margin:10px 0; font-size:12pt;">
-        <b>Fecha de faena:</b> ${escText(obj.fecha || "")}
-      </div>
-
-      <div style="margin:8px 0; font-size:10.5pt;">${refsLine}</div>
-
-      <table class="print-table" style="width:100%; border-collapse:collapse;">
-        <thead>
-          <tr>
-            <th style="width:90px;">Garrón</th>
-            <th style="width:60px;">P1</th>
-            <th style="width:60px;">P2</th>
-            <th style="width:60px;">FA</th>
-            <th style="width:60px;">P3</th>
-            <th>Detalle NC</th>
-            <th>Acción Correctiva</th>
-            <th>Acción Preventiva</th>
-            <th style="width:160px;">Responsable</th>
-          </tr>
-        </thead>
-        <tbody>${rowsAcciones}</tbody>
-      </table>
-
-      <div style="margin-top:14px; display:flex; justify-content:space-between; gap:20px;">
-        <div style="width:48%; border-top:2px solid #111; padding-top:6px;">
-          <b>Analista / Inspector:</b> ${escText(obj.inspectorAcc || obj.inspector || "")}
-        </div>
-        <div style="width:48%; border-top:2px solid #111; padding-top:6px;">
-          <b>Verificador:</b> ${escText(obj.verifAcc || obj.verif || "")}
-        </div>
-      </div>
-    `;
+    area.innerHTML = html;
   }
 
   function clearToday(){
@@ -791,44 +797,30 @@
         rows:[]
       };
     }catch{
-      return {
-        fecha:"", start:"", inspector:"", verif:"",
-        inspectorAcc:"", verifAcc:"",
-        rows:[]
-      };
+      return { fecha:"", start:"", inspector:"", verif:"", inspectorAcc:"", verifAcc:"", rows:[] };
     }
   }
   function saveToday(){ localStorage.setItem(KEY_TODAY, JSON.stringify(today)); }
 
-  function loadFinals(){
-    try{ return JSON.parse(localStorage.getItem(KEY_FINAL)) || []; }catch{ return []; }
-  }
+  function loadFinals(){ try{ return JSON.parse(localStorage.getItem(KEY_FINAL)) || []; }catch{ return []; } }
   function saveFinals(){ localStorage.setItem(KEY_FINAL, JSON.stringify(finals)); }
 
   function escText(s){ return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
   function escAttr(s){ return String(s ?? "").replaceAll("'","&#39;").replaceAll('"',"&quot;"); }
 
-  // ✅ NUEVO: “tilde” para completar todo en A (y después podés poner NC manual)
+  // ✅ TILDE: marca TODO en A (no borra nada)
   function setAllA(){
     if(!today.rows || !today.rows.length){
       alert("Primero cargá los garrones (CARGAR 100 GARRONES o +1).");
       return;
     }
-    if(!confirm("¿Completar TODOS los registros como A? (Después podés cambiar a NC manualmente)")) return;
-
     today.rows.forEach((r, idx)=>{
-      r.p1 = "A";
-      r.p2 = "A";
-      r.fa = "A";
-      r.p3 = "A";
-
-      // si la tabla está renderizada, actualizo los “pill”
+      r.p1="A"; r.p2="A"; r.fa="A"; r.p3="A";
       updatePill("p1", idx, "A");
       updatePill("p2", idx, "A");
       updatePill("fa", idx, "A");
       updatePill("p3", idx, "A");
     });
-
     saveToday();
     buildTable();
     renderSummary();
@@ -837,4 +829,5 @@
 
 </body>
 </html>
+
 
